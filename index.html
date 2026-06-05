@@ -1,0 +1,1008 @@
+
+raw
+Cfo dashboard · HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFO Decision Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1526;
+    --bg3: #141c32;
+    --card: #151d35;
+    --card2: #1a2340;
+    --border: #1e2d50;
+    --border2: #243360;
+    --text: #e8edf5;
+    --muted: #6b7fa8;
+    --muted2: #4a5a80;
+    --cyan: #00d4ff;
+    --cyan2: #00a8cc;
+    --green: #00e5a0;
+    --green2: #00b87f;
+    --amber: #ffb800;
+    --amber2: #cc9200;
+    --red: #ff4d6a;
+    --red2: #cc3d55;
+    --purple: #a855f7;
+    --blue: #3b82f6;
+    --teal: #14b8a6;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+ 
+  /* TOP NAV */
+  .nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .nav-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .nav-date { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .live-badge {
+    background: rgba(0,229,160,0.12);
+    border: 1px solid rgba(0,229,160,0.3);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .live-dot {
+    display: inline-block; width: 6px; height: 6px;
+    background: var(--green); border-radius: 50%;
+    margin-right: 4px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+ 
+  /* LAYOUT */
+  .app-body {
+    display: flex;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+ 
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 16px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
+ 
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted2);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 10px 18px 6px;
+  }
+ 
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .nav-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  .nav-item.active {
+    background: rgba(0,212,255,0.1);
+    color: var(--cyan);
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 3px;
+    background: var(--cyan);
+    border-radius: 0 3px 3px 0;
+    margin-left: -8px;
+  }
+  .nav-icon-wrap {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    background: var(--bg3);
+    transition: 0.15s;
+  }
+  .nav-item.active .nav-icon-wrap {
+    background: rgba(0,212,255,0.15);
+  }
+  .nav-item-text { flex: 1; }
+  .nav-badge {
+    font-size: 10px; font-weight: 700;
+    background: rgba(255,77,106,0.2);
+    color: var(--red);
+    border-radius: 10px;
+    padding: 1px 6px;
+    min-width: 20px; text-align: center;
+  }
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 16px;
+  }
+ 
+  /* CONTENT */
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+  .content-area::-webkit-scrollbar { width: 5px; }
+  .content-area::-webkit-scrollbar-track { background: var(--bg); }
+  .content-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+ 
+  /* MAIN (legacy compat) */
+  .main { max-width: 1400px; }
+ 
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+ 
+  /* KPI ROW */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+  .kpi.c-cyan::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+  .kpi.c-green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
+  .kpi.c-amber::before { background: linear-gradient(90deg, var(--amber), #ff9500); }
+  .kpi.c-red::before { background: linear-gradient(90deg, var(--red), var(--purple)); }
+  .kpi.c-purple::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .kpi-val { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .kpi-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 20px;
+    margin-top: 6px;
+  }
+  .badge-green { background: rgba(0,229,160,0.12); color: var(--green); border: 1px solid rgba(0,229,160,0.25); }
+  .badge-amber { background: rgba(255,184,0,0.12); color: var(--amber); border: 1px solid rgba(255,184,0,0.25); }
+  .badge-red { background: rgba(255,77,106,0.12); color: var(--red); border: 1px solid rgba(255,77,106,0.25); }
+ 
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-65-35 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media(max-width: 900px) {
+    .grid-2,.grid-3,.grid-65-35 { grid-template-columns: 1fr; }
+  }
+ 
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 13px; font-weight: 600; }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .card-body { padding: 16px 20px; }
+  .card-tag {
+    font-size: 10px; font-weight: 600; padding: 3px 8px;
+    border-radius: 6px; letter-spacing: 0.5px;
+  }
+ 
+  /* TABLE */
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th {
+    text-align: left; font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+  }
+  .tbl td {
+    padding: 10px 12px; font-size: 13px;
+    border-bottom: 1px solid rgba(30,45,80,0.5);
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: rgba(0,212,255,0.03); }
+  .tbl td.mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+  .rank-num {
+    width: 24px; height: 24px;
+    background: var(--bg3); border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--muted);
+  }
+  .rank-num.top3 { background: rgba(0,212,255,0.15); color: var(--cyan); }
+ 
+  /* STATUS DOTS */
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  .dot-red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .dot-blue { background: var(--blue); }
+ 
+  /* PROGRESS BAR */
+  .prog-wrap { background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; }
+  .prog-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+ 
+  /* SCORE RING */
+  .score-wrap {
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px 0;
+    flex-direction: column;
+  }
+  .score-ring {
+    width: 130px; height: 130px;
+    position: relative;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+  }
+  .score-num { font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+  .score-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .score-status { font-size: 14px; font-weight: 600; margin-top: 10px; }
+  .score-desc { font-size: 12px; color: var(--muted); margin-top: 4px; text-align: center; max-width: 180px; }
+ 
+  /* CASH FLOW BARS */
+  .cf-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid rgba(30,45,80,0.5);
+  }
+  .cf-row:last-child { border-bottom: none; }
+  .cf-label { width: 50px; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .cf-bar-wrap { flex: 1; background: var(--bg3); height: 28px; border-radius: 6px; overflow: hidden; position: relative; }
+  .cf-bar { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; border-radius: 6px; }
+  .cf-val { width: 110px; text-align: right; font-family: 'DM Mono',monospace; font-size: 12px; font-weight: 500; }
+ 
+  /* ALERT CARDS */
+  .alert-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid rgba(30,45,80,0.5);
+  }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .alert-icon.critical { background: rgba(255,77,106,0.15); }
+  .alert-icon.warn { background: rgba(255,184,0,0.15); }
+  .alert-name { font-size: 13px; font-weight: 600; }
+  .alert-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .alert-days {
+    margin-left: auto; font-size: 12px; font-weight: 700;
+    font-family: 'DM Mono',monospace;
+  }
+  .alert-days.critical { color: var(--red); }
+  .alert-days.warn { color: var(--amber); }
+ 
+  /* USD TRACKER */
+  .fx-input-row {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 16px;
+  }
+  .fx-input {
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text); border-radius: 8px; padding: 8px 14px;
+    font-family: 'DM Mono',monospace; font-size: 14px; width: 140px;
+    outline: none;
+  }
+  .fx-input:focus { border-color: var(--cyan); }
+  .fx-btn {
+    background: var(--cyan); color: #000; border: none;
+    border-radius: 8px; padding: 8px 16px; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+  .fx-btn:hover { background: var(--cyan2); }
+ 
+  .fx-meter {
+    background: var(--bg3); border-radius: 10px; padding: 16px;
+    margin-bottom: 14px;
+  }
+  .fx-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+  .fx-row + .fx-row { border-top: 1px solid var(--border); }
+  .fx-row-label { font-size: 12px; color: var(--muted); }
+  .fx-row-val { font-size: 14px; font-weight: 600; font-family: 'DM Mono',monospace; }
+ 
+  /* TOP/BOTTOM CARDS */
+  .tb-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid rgba(30,45,80,0.5);
+  }
+  .tb-item:last-child { border-bottom: none; }
+  .tb-rank {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .tb-name { flex: 1; font-size: 12px; font-weight: 500; }
+  .tb-val { font-size: 12px; font-weight: 600; font-family: 'DM Mono',monospace; }
+  .tb-bar { width: 80px; }
+ 
+  /* SECTION HEADERS */
+  .sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .sec-head-line { flex: 1; height: 1px; background: var(--border); }
+  .sec-head-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+ 
+  /* SCROLLABLE TABLE */
+  .tbl-wrap { overflow-x: auto; }
+  .tbl-wrap::-webkit-scrollbar { height: 4px; }
+  .tbl-wrap::-webkit-scrollbar-track { background: var(--bg3); }
+  .tbl-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+ 
+  /* BOTTOM STRIP */
+  .bottom-strip {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 10px 28px; display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+ 
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-icon">📊</div>
+    <div>
+      <div class="nav-title">CFO Decision Engine</div>
+      <div class="nav-sub">Financial Nerve Center — Live Dashboard</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-date" id="navDate"></span>
+    <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+  </div>
+</nav>
+ 
+<div class="app-body">
+ 
+<aside class="sidebar">
+  <div class="sidebar-section-label">Main Menu</div>
+  <div class="nav-item active" onclick="switchTab('overview', this)">
+    <div class="nav-icon-wrap">📈</div>
+    <span class="nav-item-text">Overview</span>
+  </div>
+  <div class="nav-item" onclick="switchTab('clients', this)">
+    <div class="nav-icon-wrap">👥</div>
+    <span class="nav-item-text">Client Analytics</span>
+  </div>
+  <div class="nav-item" onclick="switchTab('collections', this)">
+    <div class="nav-icon-wrap">💰</div>
+    <span class="nav-item-text">Collections</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-label">Finance</div>
+  <div class="nav-item" onclick="switchTab('cashflow', this)">
+    <div class="nav-icon-wrap">🔄</div>
+    <span class="nav-item-text">Cash Flow</span>
+  </div>
+  <div class="nav-item" onclick="switchTab('alerts', this)">
+    <div class="nav-icon-wrap">🚨</div>
+    <span class="nav-item-text">Overdue Alerts</span>
+    <span class="nav-badge" id="sidebarAlertCount">9</span>
+  </div>
+  <div class="nav-item" onclick="switchTab('usd', this)">
+    <div class="nav-icon-wrap">💱</div>
+    <span class="nav-item-text">USD Impact</span>
+  </div>
+</aside>
+ 
+<div class="content-area">
+<div class="main">
+ 
+<!-- ═══════════════════════════════ OVERVIEW ═══════════════════════════════ -->
+<div class="section active" id="sec-overview">
+  <div class="kpi-grid" id="kpiGrid"></div>
+ 
+  <div class="grid-65-35">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Revenue by Client — Ranked</div>
+          <div class="card-sub">All 15 clients · Invoice value vs received</div>
+        </div>
+        <span class="card-tag badge-amber">RANKED</span>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="tbl-wrap">
+          <table class="tbl" id="revenueRanked"></table>
+        </div>
+      </div>
+    </div>
+ 
+    <div>
+      <!-- Working Capital Score -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-head">
+          <div class="card-title">Working Capital Score</div>
+        </div>
+        <div class="card-body">
+          <div class="score-wrap" id="wcScore"></div>
+          <div id="wcBreakdown"></div>
+        </div>
+      </div>
+ 
+      <!-- Collection Efficiency -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Collection Efficiency</div>
+          <div class="card-sub">Per client %</div>
+        </div>
+        <div class="card-body" id="collEffCard"></div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════ CLIENTS ═══════════════════════════════ -->
+<div class="section" id="sec-clients">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">🏆 Top 10 Clients</div>
+          <div class="card-sub">By total revenue</div>
+        </div>
+        <span class="card-tag" style="background:rgba(0,229,160,0.12);color:var(--green);border:1px solid rgba(0,229,160,0.25)">TOP 10</span>
+      </div>
+      <div class="card-body" id="top10"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">📉 Bottom 10 Clients</div>
+          <div class="card-sub">Needs attention</div>
+        </div>
+        <span class="card-tag badge-amber">BOTTOM 10</span>
+      </div>
+      <div class="card-body" id="bottom10"></div>
+    </div>
+  </div>
+ 
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Margin per Client</div>
+      <div class="card-sub">Gross profit margin % — profitability ranking</div>
+    </div>
+    <div class="card-body" id="marginCard"></div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════ COLLECTIONS ═══════════════════════════════ -->
+<div class="section" id="sec-collections">
+  <div class="kpi-grid" id="collKpi"></div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Outstanding per Client — With Aging</div>
+      <div class="card-sub">Days overdue · Amount outstanding · Recovery risk</div>
+    </div>
+    <div class="card-body" style="padding:0">
+      <div class="tbl-wrap">
+        <table class="tbl" id="outstandingTable"></table>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════ CASH FLOW ═══════════════════════════════ -->
+<div class="section" id="sec-cashflow">
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-head">
+      <div class="card-title">Cash Flow Forecast — 30 / 60 / 90 Days</div>
+      <div class="card-sub">Net cash position projection based on outstanding receivables</div>
+    </div>
+    <div class="card-body" id="cfForecast"></div>
+  </div>
+  <div class="grid-3" id="cfGrid"></div>
+</div>
+ 
+<!-- ═══════════════════════════════ ALERTS ═══════════════════════════════ -->
+<div class="section" id="sec-alerts">
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">🚨 Automatic Overdue Alerts</div>
+        <div class="card-sub">Clients past due date — sorted by severity</div>
+      </div>
+      <span id="alertCount" class="card-tag badge-red"></span>
+    </div>
+    <div class="card-body" id="alertsList"></div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════ USD TRACKER ═══════════════════════════════ -->
+<div class="section" id="sec-usd">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">💱 USD/PKR Impact Tracker</div>
+        <div class="card-sub">Adjust exchange rate — see PKR cost impact instantly</div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:12px;font-size:12px;color:var(--muted)">Current rate used in data: <span style="color:var(--cyan);font-family:'DM Mono',monospace;font-weight:600">283.76 PKR/USD</span></div>
+        <div class="fx-input-row">
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">USD Exposure (USD)</div>
+            <input class="fx-input" id="fxUSD" type="number" value="17113" placeholder="USD amount">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">New USD/PKR Rate</div>
+            <input class="fx-input" id="fxRate" type="number" value="283.76" placeholder="Rate">
+          </div>
+          <div style="margin-top:20px">
+            <button class="fx-btn" onclick="calcFX()">Calculate</button>
+          </div>
+        </div>
+        <div id="fxResult"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Rate Sensitivity Analysis</div>
+        <div class="card-sub">PKR cost at different exchange rates</div>
+      </div>
+      <div class="card-body" id="fxSensitivity"></div>
+    </div>
+  </div>
+</div>
+ 
+</div><!-- main -->
+</div><!-- content-area -->
+</div><!-- app-body -->
+ 
+<div class="bottom-strip">
+  <span>CFO Decision Engine v2.0 — Hamza Bhai Data</span>
+  <span id="bottomDate"></span>
+</div>
+ 
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+const RAW_DATA = [
+  {name:"Mujtaba Crockery Store",revenue:4555343,cogs:3200000,received:0,due:"2026-02-15",invoice:"2026-01-15",status:"Unpaid"},
+  {name:"Sinoglass Trading Pvt Ltd",revenue:1850000,cogs:1100000,received:1850000,due:"2026-03-01",invoice:"2026-02-01",status:"Paid"},
+  {name:"Fancy Glass Ware Crockery",revenue:1200000,cogs:720000,received:0,due:"2026-04-15",invoice:"2026-03-15",status:"Unpaid"},
+  {name:"Waqar Trader",revenue:920000,cogs:680000,received:300000,due:"2026-03-10",invoice:"2026-02-10",status:"Partial"},
+  {name:"Umar Farooq",revenue:780000,cogs:480000,received:400000,due:"2026-04-01",invoice:"2026-03-01",status:"Partial"},
+  {name:"Mudassar Crockery Store",revenue:680000,cogs:490000,received:0,due:"2026-03-20",invoice:"2026-02-20",status:"Unpaid"},
+  {name:"Gujrat Bartan Store",revenue:650000,cogs:450000,received:650000,due:"2026-03-15",invoice:"2026-02-15",status:"Paid"},
+  {name:"Qazi Brothers Plastic",revenue:560000,cogs:390000,received:200000,due:"2026-05-20",invoice:"2026-04-20",status:"Partial"},
+  {name:"HAA Traders",revenue:430000,cogs:350000,received:0,due:"2026-05-15",invoice:"2026-04-15",status:"Unpaid"},
+  {name:"Azaz Crockery",revenue:410000,cogs:300000,received:100000,due:"2026-04-25",invoice:"2026-03-25",status:"Partial"},
+  {name:"Ahmad Enterprises",revenue:340000,cogs:310000,received:0,due:"2026-01-01",invoice:"2025-12-01",status:"Unpaid"},
+  {name:"Usman Enterprises",revenue:320000,cogs:240000,received:0,due:"2026-06-10",invoice:"2026-05-10",status:"Unpaid"},
+  {name:"Imran Variety Center",revenue:290000,cogs:220000,received:150000,due:"2026-06-09",invoice:"2026-05-09",status:"Partial"},
+  {name:"Bartan Markaz",revenue:250000,cogs:190000,received:0,due:"2026-06-15",invoice:"2026-05-15",status:"Unpaid"},
+  {name:"Madni Traders",revenue:180000,cogs:160000,received:0,due:"2026-06-20",invoice:"2026-05-20",status:"Unpaid"},
+];
+ 
+const TODAY = new Date("2026-06-05");
+const USD_EXPOSURE_PKR = 15344104;
+const USD_RATE_BASE = 283.76;
+const USD_EXPOSURE_USD = Math.round(USD_EXPOSURE_PKR / USD_RATE_BASE);
+ 
+// ── COMPUTED ─────────────────────────────────────────────────────────────────
+const clients = RAW_DATA.map(d => {
+  const outstanding = d.revenue - d.received;
+  const daysOverdue = Math.max(0, Math.floor((TODAY - new Date(d.due)) / 86400000));
+  const collEff = d.revenue > 0 ? Math.round((d.received / d.revenue) * 100) : 0;
+  const profit = d.revenue - d.cogs;
+  const margin = d.revenue > 0 ? +((profit / d.revenue) * 100).toFixed(1) : 0;
+  const isOverdue = outstanding > 0 && daysOverdue > 0;
+  return {...d, outstanding, daysOverdue, collEff, profit, margin, isOverdue};
+});
+ 
+const totalRevenue = clients.reduce((s,c)=>s+c.revenue,0);
+const totalReceived = clients.reduce((s,c)=>s+c.received,0);
+const totalOutstanding = clients.reduce((s,c)=>s+c.outstanding,0);
+const totalProfit = clients.reduce((s,c)=>s+c.profit,0);
+const overallMargin = +((totalProfit/totalRevenue)*100).toFixed(1);
+const collEff = +((totalReceived/totalRevenue)*100).toFixed(1);
+const overdueClients = clients.filter(c=>c.isOverdue);
+const overdueAmount = overdueClients.reduce((s,c)=>s+c.outstanding,0);
+ 
+// Cash flow: 30/60/90 day buckets
+function cashIn(days) {
+  return clients.filter(c => {
+    const due = new Date(c.due);
+    const diff = Math.floor((due - TODAY) / 86400000);
+    return diff <= days && diff >= 0 && c.outstanding > 0;
+  }).reduce((s,c)=>s+c.outstanding,0);
+}
+const cf30 = cashIn(30);
+const cf60 = cashIn(60);
+const cf90 = cashIn(90);
+ 
+// Working capital score
+function calcWCScore() {
+  let score = 0;
+  // Collection efficiency (30 pts)
+  score += Math.min(30, collEff * 0.3);
+  // Overdue ratio (25 pts)
+  const overdueRatio = overdueAmount / totalOutstanding;
+  score += Math.max(0, 25 - overdueRatio * 25);
+  // Margin (20 pts)
+  score += Math.min(20, overallMargin * 0.5);
+  // Cash coverage 30-day (25 pts)
+  const coverage = totalRevenue > 0 ? cf30 / totalRevenue : 0;
+  score += Math.min(25, coverage * 50);
+  return Math.round(score);
+}
+const wcScore = calcWCScore();
+ 
+// ── FORMAT ────────────────────────────────────────────────────────────────────
+const fmt = n => n >= 1e6
+  ? (n/1e6).toFixed(2) + 'M'
+  : n >= 1e3 ? (n/1e3).toFixed(0) + 'K' : n.toString();
+const fmtPKR = n => '₨ ' + n.toLocaleString('en-PK');
+ 
+function statusBadge(status) {
+  if(status==='Paid') return `<span class="kpi-badge badge-green">Paid</span>`;
+  if(status==='Partial') return `<span class="kpi-badge badge-amber">Partial</span>`;
+  return `<span class="kpi-badge badge-red">Unpaid</span>`;
+}
+ 
+function overdueSeverity(days) {
+  if(days > 90) return 'critical';
+  if(days > 30) return 'warn';
+  return '';
+}
+ 
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderKPIs() {
+  const el = document.getElementById('kpiGrid');
+  const kpis = [
+    {label:'Total Revenue',val:'₨ '+fmt(totalRevenue),sub:'All invoices',cls:'c-cyan',badge:null},
+    {label:'Total Received',val:'₨ '+fmt(totalReceived),sub:`${collEff}% collected`,cls:'c-green',badge:{text:collEff+'%',cls:'badge-green'}},
+    {label:'Outstanding',val:'₨ '+fmt(totalOutstanding),sub:`${clients.filter(c=>c.outstanding>0).length} clients`,cls:'c-amber',badge:null},
+    {label:'Overdue Amount',val:'₨ '+fmt(overdueAmount),sub:`${overdueClients.length} clients overdue`,cls:'c-red',badge:{text:overdueClients.length+' OVERDUE',cls:'badge-red'}},
+    {label:'Avg Margin',val:overallMargin+'%',sub:'Gross profit margin',cls:'c-purple',badge:null},
+    {label:'WC Score',val:wcScore+'/100',sub:'Working capital health',cls:'c-cyan',badge:{text:wcScore>=70?'HEALTHY':wcScore>=40?'WARNING':'CRITICAL',cls:wcScore>=70?'badge-green':wcScore>=40?'badge-amber':'badge-red'}},
+  ];
+  el.innerHTML = kpis.map(k=>`
+    <div class="kpi ${k.cls}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      ${k.badge ? `<div><span class="kpi-badge ${k.badge.cls}">${k.badge.text}</span></div>` : ''}
+    </div>`).join('');
+}
+ 
+function renderRevenueRanked() {
+  const sorted = [...clients].sort((a,b)=>b.revenue-a.revenue);
+  const t = document.getElementById('revenueRanked');
+  t.innerHTML = `<thead><tr>
+    <th>#</th><th>Client</th><th>Revenue</th><th>Received</th><th>Outstanding</th><th>Margin</th><th>Status</th>
+  </tr></thead><tbody>` +
+  sorted.map((c,i)=>`<tr>
+    <td><span class="rank-num ${i<3?'top3':''}">${i+1}</span></td>
+    <td style="font-weight:500;max-width:160px">${c.name}</td>
+    <td class="mono" style="color:var(--cyan)">₨${fmt(c.revenue)}</td>
+    <td class="mono" style="color:var(--green)">₨${fmt(c.received)}</td>
+    <td class="mono" style="color:${c.outstanding>0?'var(--amber)':'var(--muted)'}">₨${fmt(c.outstanding)}</td>
+    <td class="mono" style="color:${c.margin>30?'var(--green)':c.margin>15?'var(--amber)':'var(--red)'}">${c.margin}%</td>
+    <td>${statusBadge(c.status)}</td>
+  </tr>`).join('') + '</tbody>';
+}
+ 
+function renderWCScore() {
+  const el = document.getElementById('wcScore');
+  const color = wcScore >= 70 ? 'var(--green)' : wcScore >= 40 ? 'var(--amber)' : 'var(--red)';
+  const label = wcScore >= 70 ? '✅ Healthy' : wcScore >= 40 ? '⚠️ Warning' : '🔴 Critical';
+  const desc = wcScore >= 70 ? 'Cash position is strong' : wcScore >= 40 ? 'Needs attention soon' : 'Immediate action needed';
+  const pct = wcScore / 100;
+  const circ = 2 * Math.PI * 50;
+  el.innerHTML = `
+    <div class="score-ring">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="50" fill="none" stroke="var(--bg3)" stroke-width="10"/>
+        <circle cx="65" cy="65" r="50" fill="none" stroke="${color}" stroke-width="10"
+          stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}"
+          stroke-linecap="round" style="transition:stroke-dashoffset 1s ease"/>
+      </svg>
+      <div class="score-center">
+        <div class="score-num" style="color:${color}">${wcScore}</div>
+        <div class="score-label">/100</div>
+      </div>
+    </div>
+    <div class="score-status" style="color:${color}">${label}</div>
+    <div class="score-desc">${desc}</div>`;
+ 
+  document.getElementById('wcBreakdown').innerHTML = `
+    <div style="margin-top:16px">
+      ${[
+        {l:'Collection Rate',v:Math.round(Math.min(30,collEff*0.3)),max:30,unit:'pts'},
+        {l:'Overdue Ratio',v:Math.round(Math.max(0,25-(overdueAmount/totalOutstanding)*25)),max:25,unit:'pts'},
+        {l:'Profit Margin',v:Math.round(Math.min(20,overallMargin*0.5)),max:20,unit:'pts'},
+        {l:'30-Day Coverage',v:Math.round(Math.min(25,(cf30/totalRevenue)*50)),max:25,unit:'pts'},
+      ].map(f=>`<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          <span style="color:var(--muted)">${f.l}</span>
+          <span style="font-weight:600">${f.v}/${f.max}</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:${(f.v/f.max)*100}%;background:linear-gradient(90deg,var(--cyan),var(--blue))"></div></div>
+      </div>`).join('')}
+    </div>`;
+}
+ 
+function renderCollEff() {
+  const sorted = [...clients].sort((a,b)=>b.collEff-a.collEff);
+  document.getElementById('collEffCard').innerHTML = sorted.map(c=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span style="font-weight:500">${c.name}</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:600;color:${c.collEff>=80?'var(--green)':c.collEff>=40?'var(--amber)':'var(--red)'}">${c.collEff}%</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${c.collEff}%;background:${c.collEff>=80?'var(--green)':c.collEff>=40?'var(--amber)':'var(--red)'}"></div></div>
+    </div>`).join('');
+}
+ 
+function renderTop10Bottom10() {
+  const sorted = [...clients].sort((a,b)=>b.revenue-a.revenue);
+  const top10 = sorted.slice(0,10);
+  const bot10 = [...sorted].reverse().slice(0,10);
+  const maxRev = top10[0].revenue;
+ 
+  document.getElementById('top10').innerHTML = top10.map((c,i)=>`
+    <div class="tb-item">
+      <div class="tb-rank" style="background:${i<3?'rgba(0,212,255,0.15)':'var(--bg3)'};color:${i<3?'var(--cyan)':'var(--muted)'}">${i+1}</div>
+      <div class="tb-name">${c.name}</div>
+      <div class="tb-bar"><div class="prog-wrap"><div class="prog-bar" style="width:${Math.round((c.revenue/maxRev)*100)}%;background:linear-gradient(90deg,var(--cyan),var(--blue))"></div></div></div>
+      <div class="tb-val" style="color:var(--cyan)">₨${fmt(c.revenue)}</div>
+    </div>`).join('');
+ 
+  const maxBot = Math.max(...bot10.map(c=>c.revenue));
+  document.getElementById('bottom10').innerHTML = bot10.map((c,i)=>`
+    <div class="tb-item">
+      <div class="tb-rank" style="background:rgba(255,77,106,0.12);color:var(--red)">${i+1}</div>
+      <div class="tb-name">${c.name}</div>
+      <div class="tb-bar"><div class="prog-wrap"><div class="prog-bar" style="width:${Math.round((c.revenue/maxBot)*100)}%;background:var(--red)"></div></div></div>
+      <div class="tb-val" style="color:var(--amber)">₨${fmt(c.revenue)}</div>
+    </div>`).join('');
+}
+ 
+function renderMargin() {
+  const sorted = [...clients].sort((a,b)=>b.margin-a.margin);
+  document.getElementById('marginCard').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">` +
+  sorted.map(c=>`
+    <div style="background:var(--bg3);border-radius:8px;padding:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:500">${c.name}</div>
+        <div style="font-size:14px;font-weight:700;color:${c.margin>35?'var(--green)':c.margin>20?'var(--amber)':'var(--red)'}">${c.margin}%</div>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${c.margin}%;background:${c.margin>35?'var(--green)':c.margin>20?'var(--amber)':'var(--red)'}"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted)">
+        <span>Revenue: ₨${fmt(c.revenue)}</span>
+        <span>Profit: ₨${fmt(c.profit)}</span>
+      </div>
+    </div>`).join('') + '</div>';
+}
+ 
+function renderOutstanding() {
+  const sorted = [...clients].filter(c=>c.outstanding>0).sort((a,b)=>b.daysOverdue-a.daysOverdue);
+  const t = document.getElementById('outstandingTable');
+  t.innerHTML = `<thead><tr>
+    <th>Client</th><th>Outstanding</th><th>Invoice</th><th>Due Date</th><th>Days Overdue</th><th>Coll. Eff.</th><th>Risk</th>
+  </tr></thead><tbody>` +
+  sorted.map(c=>{
+    const risk = c.daysOverdue > 90 ? ['🔴 Critical','var(--red)'] : c.daysOverdue > 30 ? ['🟡 High','var(--amber)'] : c.daysOverdue > 0 ? ['🟠 Medium','#ff9500'] : ['🟢 Low','var(--green)'];
+    return `<tr>
+      <td style="font-weight:500">${c.name}</td>
+      <td class="mono" style="color:var(--amber)">₨${fmt(c.outstanding)}</td>
+      <td class="mono" style="color:var(--muted);font-size:11px">${c.invoice}</td>
+      <td class="mono" style="font-size:11px">${c.due}</td>
+      <td class="mono" style="font-weight:700;color:${c.daysOverdue>0?'var(--red)':'var(--green)'}">${c.daysOverdue > 0 ? '+'+c.daysOverdue+' days' : 'Not due'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prog-wrap" style="width:60px"><div class="prog-bar" style="width:${c.collEff}%;background:${c.collEff>=80?'var(--green)':c.collEff>=40?'var(--amber)':'var(--red)'}"></div></div>
+          <span class="mono" style="font-size:11px">${c.collEff}%</span>
+        </div>
+      </td>
+      <td style="color:${risk[1]};font-size:12px;font-weight:600">${risk[0]}</td>
+    </tr>`;
+  }).join('') + '</tbody>';
+}
+ 
+function renderCollKPI() {
+  const el = document.getElementById('collKpi');
+  el.innerHTML = [
+    {label:'Total Outstanding',val:'₨'+fmt(totalOutstanding),sub:'Receivable balance',cls:'c-amber'},
+    {label:'Overdue Outstanding',val:'₨'+fmt(overdueAmount),sub:overdueClients.length+' clients past due',cls:'c-red'},
+    {label:'Collection Efficiency',val:collEff+'%',sub:'Overall recovery rate',cls:'c-green'},
+    {label:'At-Risk Amount',val:'₨'+fmt(clients.filter(c=>c.daysOverdue>90).reduce((s,c)=>s+c.outstanding,0)),sub:'90+ days overdue',cls:'c-red'},
+  ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+}
+ 
+function renderCashFlow() {
+  const el = document.getElementById('cfForecast');
+  const maxVal = Math.max(cf30, cf60, cf90, 1);
+  el.innerHTML = ['30','60','90'].map((d,i) => {
+    const val = [cf30,cf60,cf90][i];
+    const pct = Math.round((val/maxVal)*100);
+    const color = ['var(--cyan)','var(--green)','var(--purple)'][i];
+    return `<div class="cf-row">
+      <div class="cf-label">${d}d</div>
+      <div class="cf-bar-wrap">
+        <div class="cf-bar" style="width:${pct}%;background:linear-gradient(90deg,${color}22,${color}44);">
+          <span style="color:${color};font-size:11px;font-weight:700">${d}-Day Window</span>
+        </div>
+      </div>
+      <div class="cf-val" style="color:${color}">₨${fmt(val)}</div>
+    </div>`;
+  }).join('');
+ 
+  const cfGrid = document.getElementById('cfGrid');
+  const cards = [
+    {period:'30 Days',val:cf30,color:'var(--cyan)',desc:'Receivables due in next 30 days',icon:'📅'},
+    {period:'60 Days',val:cf60,color:'var(--green)',desc:'Cumulative receivables by 60 days',icon:'📆'},
+    {period:'90 Days',val:cf90,color:'var(--purple)',desc:'Total projected cash by 90 days',icon:'🗓️'},
+  ];
+  cfGrid.innerHTML = cards.map(c=>`
+    <div class="card">
+      <div class="card-body" style="text-align:center;padding:28px">
+        <div style="font-size:28px;margin-bottom:8px">${c.icon}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${c.period} Cash In</div>
+        <div style="font-size:28px;font-weight:800;color:${c.color};letter-spacing:-1px">₨${fmt(c.val)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">${c.desc}</div>
+      </div>
+    </div>`).join('');
+}
+ 
+function renderAlerts() {
+  const sorted = [...overdueClients].sort((a,b)=>b.daysOverdue-a.daysOverdue);
+  document.getElementById('alertCount').textContent = sorted.length + ' ALERTS';
+  document.getElementById('alertsList').innerHTML = sorted.length === 0
+    ? '<div style="color:var(--green);text-align:center;padding:20px">✅ No overdue clients</div>'
+    : sorted.map(c=>{
+        const sev = c.daysOverdue > 90 ? 'critical' : 'warn';
+        return `<div class="alert-item">
+          <div class="alert-icon ${sev}">${c.daysOverdue>90?'🚨':'⚠️'}</div>
+          <div style="flex:1">
+            <div class="alert-name">${c.name}</div>
+            <div class="alert-detail">Outstanding: ₨${fmt(c.outstanding)} · Due: ${c.due} · Efficiency: ${c.collEff}%</div>
+          </div>
+          <div class="alert-days ${sev}">+${c.daysOverdue}d</div>
+        </div>`;
+      }).join('');
+}
+ 
+function renderFXSensitivity() {
+  const rates = [270, 280, 283.76, 290, 300, 310, 320];
+  document.getElementById('fxSensitivity').innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>USD/PKR Rate</th><th>PKR Cost</th><th>vs Base</th></tr></thead>
+      <tbody>` +
+    rates.map(r=>{
+      const cost = Math.round(USD_EXPOSURE_USD * r);
+      const diff = cost - USD_EXPOSURE_PKR;
+      const isBase = Math.abs(r - USD_RATE_BASE) < 0.01;
+      return `<tr style="${isBase?'background:rgba(0,212,255,0.05)':''}">
+        <td class="mono" style="color:${isBase?'var(--cyan)':'inherit'}">${r.toFixed(2)}${isBase?' ★':''}</td>
+        <td class="mono">₨${fmt(cost)}</td>
+        <td class="mono" style="color:${diff>0?'var(--red)':diff<0?'var(--green)':'var(--muted)'}">${diff===0?'Base':(diff>0?'+':'')+fmt(Math.abs(diff))}</td>
+      </tr>`;
+    }).join('') + '</tbody></table>';
+}
+ 
+function calcFX() {
+  const usd = parseFloat(document.getElementById('fxUSD').value)||0;
+  const rate = parseFloat(document.getElementById('fxRate').value)||283.76;
+  const baseCost = Math.round(usd * USD_RATE_BASE);
+  const newCost = Math.round(usd * rate);
+  const diff = newCost - baseCost;
+  const color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--muted)';
+  document.getElementById('fxResult').innerHTML = `
+    <div class="fx-meter">
+      <div class="fx-row"><span class="fx-row-label">USD Amount</span><span class="fx-row-val">$ ${usd.toLocaleString()}</span></div>
+      <div class="fx-row"><span class="fx-row-label">Base Rate (283.76)</span><span class="fx-row-val">₨ ${baseCost.toLocaleString()}</span></div>
+      <div class="fx-row"><span class="fx-row-label">New Rate (${rate})</span><span class="fx-row-val" style="color:var(--cyan)">₨ ${newCost.toLocaleString()}</span></div>
+      <div class="fx-row"><span class="fx-row-label">Impact</span><span class="fx-row-val" style="color:${color}">${diff>0?'▲ +':'▼ '}₨ ${Math.abs(diff).toLocaleString()}</span></div>
+    </div>`;
+}
+ 
+// ── SIDEBAR NAV ───────────────────────────────────────────────────────────────
+function switchTab(id, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+}
+ 
+// ── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  const now = new Date();
+  const ds = now.toLocaleDateString('en-PK',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('navDate').textContent = ds;
+  document.getElementById('bottomDate').textContent = 'Last updated: '+ds;
+ 
+  renderKPIs();
+  renderRevenueRanked();
+  renderWCScore();
+  renderCollEff();
+  renderTop10Bottom10();
+  renderMargin();
+  renderOutstanding();
+  renderCollKPI();
+  renderCashFlow();
+  renderAlerts();
+  renderFXSensitivity();
+  calcFX();
+  // update sidebar badge
+  document.getElementById('sidebarAlertCount').textContent = overdueClients.length;
+}
+ 
+init();
+</script>
+</body>
+</html>
