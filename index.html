@@ -1,1008 +1,1177 @@
-
-raw
-Cfo dashboard · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CFO Decision Engine</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GC | CFO Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  :root {
-    --bg: #0a0e1a;
-    --bg2: #0f1526;
-    --bg3: #141c32;
-    --card: #151d35;
-    --card2: #1a2340;
-    --border: #1e2d50;
-    --border2: #243360;
-    --text: #e8edf5;
-    --muted: #6b7fa8;
-    --muted2: #4a5a80;
-    --cyan: #00d4ff;
-    --cyan2: #00a8cc;
-    --green: #00e5a0;
-    --green2: #00b87f;
-    --amber: #ffb800;
-    --amber2: #cc9200;
-    --red: #ff4d6a;
-    --red2: #cc3d55;
-    --purple: #a855f7;
-    --blue: #3b82f6;
-    --teal: #14b8a6;
-  }
- 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
- 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
- 
-  /* TOP NAV */
-  .nav {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 0 28px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .nav-brand {
-    display: flex; align-items: center; gap: 10px;
-  }
-  .nav-icon {
-    width: 32px; height: 32px;
-    background: linear-gradient(135deg, var(--cyan), var(--blue));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-  }
-  .nav-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-  .nav-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
-  .nav-right { display: flex; align-items: center; gap: 16px; }
-  .nav-date { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
-  .live-badge {
-    background: rgba(0,229,160,0.12);
-    border: 1px solid rgba(0,229,160,0.3);
-    color: var(--green);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-  }
-  .live-dot {
-    display: inline-block; width: 6px; height: 6px;
-    background: var(--green); border-radius: 50%;
-    margin-right: 4px;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
- 
-  /* LAYOUT */
-  .app-body {
-    display: flex;
-    height: calc(100vh - 56px);
-    overflow: hidden;
-  }
- 
-  /* SIDEBAR */
-  .sidebar {
-    width: 220px;
-    min-width: 220px;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    padding: 16px 0;
-  }
-  .sidebar::-webkit-scrollbar { width: 3px; }
-  .sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
- 
-  .sidebar-section-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--muted2);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    padding: 10px 18px 6px;
-  }
- 
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    margin: 1px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.15s;
-    position: relative;
-  }
-  .nav-item:hover {
-    background: rgba(255,255,255,0.04);
-    color: var(--text);
-  }
-  .nav-item.active {
-    background: rgba(0,212,255,0.1);
-    color: var(--cyan);
-  }
-  .nav-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 6px; bottom: 6px;
-    width: 3px;
-    background: var(--cyan);
-    border-radius: 0 3px 3px 0;
-    margin-left: -8px;
-  }
-  .nav-icon-wrap {
-    width: 28px; height: 28px;
-    border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-    background: var(--bg3);
-    transition: 0.15s;
-  }
-  .nav-item.active .nav-icon-wrap {
-    background: rgba(0,212,255,0.15);
-  }
-  .nav-item-text { flex: 1; }
-  .nav-badge {
-    font-size: 10px; font-weight: 700;
-    background: rgba(255,77,106,0.2);
-    color: var(--red);
-    border-radius: 10px;
-    padding: 1px 6px;
-    min-width: 20px; text-align: center;
-  }
-  .sidebar-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 10px 16px;
-  }
- 
-  /* CONTENT */
-  .content-area {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 28px;
-  }
-  .content-area::-webkit-scrollbar { width: 5px; }
-  .content-area::-webkit-scrollbar-track { background: var(--bg); }
-  .content-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
- 
-  /* MAIN (legacy compat) */
-  .main { max-width: 1400px; }
- 
-  /* SECTION */
-  .section { display: none; }
-  .section.active { display: block; }
- 
-  /* KPI ROW */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-    margin-bottom: 24px;
-  }
-  .kpi {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .kpi::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    border-radius: 12px 12px 0 0;
-  }
-  .kpi.c-cyan::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
-  .kpi.c-green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
-  .kpi.c-amber::before { background: linear-gradient(90deg, var(--amber), #ff9500); }
-  .kpi.c-red::before { background: linear-gradient(90deg, var(--red), var(--purple)); }
-  .kpi.c-purple::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
-  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-  .kpi-val { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
-  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
-  .kpi-badge {
-    display: inline-block;
-    font-size: 10px; font-weight: 600;
-    padding: 2px 7px; border-radius: 20px;
-    margin-top: 6px;
-  }
-  .badge-green { background: rgba(0,229,160,0.12); color: var(--green); border: 1px solid rgba(0,229,160,0.25); }
-  .badge-amber { background: rgba(255,184,0,0.12); color: var(--amber); border: 1px solid rgba(255,184,0,0.25); }
-  .badge-red { background: rgba(255,77,106,0.12); color: var(--red); border: 1px solid rgba(255,77,106,0.25); }
- 
-  /* GRID LAYOUTS */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .grid-65-35 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 16px; margin-bottom: 20px; }
-  @media(max-width: 900px) {
-    .grid-2,.grid-3,.grid-65-35 { grid-template-columns: 1fr; }
-  }
- 
-  /* CARD */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  .card-head {
-    padding: 16px 20px 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .card-title { font-size: 13px; font-weight: 600; }
-  .card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .card-body { padding: 16px 20px; }
-  .card-tag {
-    font-size: 10px; font-weight: 600; padding: 3px 8px;
-    border-radius: 6px; letter-spacing: 0.5px;
-  }
- 
-  /* TABLE */
-  .tbl { width: 100%; border-collapse: collapse; }
-  .tbl th {
-    text-align: left; font-size: 10px; font-weight: 600;
-    color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
-    padding: 8px 12px; border-bottom: 1px solid var(--border);
-  }
-  .tbl td {
-    padding: 10px 12px; font-size: 13px;
-    border-bottom: 1px solid rgba(30,45,80,0.5);
-  }
-  .tbl tr:last-child td { border-bottom: none; }
-  .tbl tr:hover td { background: rgba(0,212,255,0.03); }
-  .tbl td.mono { font-family: 'DM Mono', monospace; font-size: 12px; }
-  .rank-num {
-    width: 24px; height: 24px;
-    background: var(--bg3); border-radius: 6px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 600; color: var(--muted);
-  }
-  .rank-num.top3 { background: rgba(0,212,255,0.15); color: var(--cyan); }
- 
-  /* STATUS DOTS */
-  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-  .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
-  .dot-amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
-  .dot-red { background: var(--red); box-shadow: 0 0 6px var(--red); }
-  .dot-blue { background: var(--blue); }
- 
-  /* PROGRESS BAR */
-  .prog-wrap { background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; }
-  .prog-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
- 
-  /* SCORE RING */
-  .score-wrap {
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px 0;
-    flex-direction: column;
-  }
-  .score-ring {
-    width: 130px; height: 130px;
-    position: relative;
-  }
-  .score-ring svg { transform: rotate(-90deg); }
-  .score-center {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    text-align: center;
-  }
-  .score-num { font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
-  .score-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .score-status { font-size: 14px; font-weight: 600; margin-top: 10px; }
-  .score-desc { font-size: 12px; color: var(--muted); margin-top: 4px; text-align: center; max-width: 180px; }
- 
-  /* CASH FLOW BARS */
-  .cf-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid rgba(30,45,80,0.5);
-  }
-  .cf-row:last-child { border-bottom: none; }
-  .cf-label { width: 50px; font-size: 11px; font-weight: 600; color: var(--muted); }
-  .cf-bar-wrap { flex: 1; background: var(--bg3); height: 28px; border-radius: 6px; overflow: hidden; position: relative; }
-  .cf-bar { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; border-radius: 6px; }
-  .cf-val { width: 110px; text-align: right; font-family: 'DM Mono',monospace; font-size: 12px; font-weight: 500; }
- 
-  /* ALERT CARDS */
-  .alert-item {
-    display: flex; gap: 12px; align-items: flex-start;
-    padding: 12px 0; border-bottom: 1px solid rgba(30,45,80,0.5);
-  }
-  .alert-item:last-child { border-bottom: none; }
-  .alert-icon {
-    width: 36px; height: 36px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
-  }
-  .alert-icon.critical { background: rgba(255,77,106,0.15); }
-  .alert-icon.warn { background: rgba(255,184,0,0.15); }
-  .alert-name { font-size: 13px; font-weight: 600; }
-  .alert-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .alert-days {
-    margin-left: auto; font-size: 12px; font-weight: 700;
-    font-family: 'DM Mono',monospace;
-  }
-  .alert-days.critical { color: var(--red); }
-  .alert-days.warn { color: var(--amber); }
- 
-  /* USD TRACKER */
-  .fx-input-row {
-    display: flex; gap: 10px; align-items: center; margin-bottom: 16px;
-  }
-  .fx-input {
-    background: var(--bg3); border: 1px solid var(--border2);
-    color: var(--text); border-radius: 8px; padding: 8px 14px;
-    font-family: 'DM Mono',monospace; font-size: 14px; width: 140px;
-    outline: none;
-  }
-  .fx-input:focus { border-color: var(--cyan); }
-  .fx-btn {
-    background: var(--cyan); color: #000; border: none;
-    border-radius: 8px; padding: 8px 16px; font-size: 13px;
-    font-weight: 600; cursor: pointer; transition: 0.2s;
-  }
-  .fx-btn:hover { background: var(--cyan2); }
- 
-  .fx-meter {
-    background: var(--bg3); border-radius: 10px; padding: 16px;
-    margin-bottom: 14px;
-  }
-  .fx-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
-  .fx-row + .fx-row { border-top: 1px solid var(--border); }
-  .fx-row-label { font-size: 12px; color: var(--muted); }
-  .fx-row-val { font-size: 14px; font-weight: 600; font-family: 'DM Mono',monospace; }
- 
-  /* TOP/BOTTOM CARDS */
-  .tb-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 0; border-bottom: 1px solid rgba(30,45,80,0.5);
-  }
-  .tb-item:last-child { border-bottom: none; }
-  .tb-rank {
-    width: 22px; height: 22px; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; flex-shrink: 0;
-  }
-  .tb-name { flex: 1; font-size: 12px; font-weight: 500; }
-  .tb-val { font-size: 12px; font-weight: 600; font-family: 'DM Mono',monospace; }
-  .tb-bar { width: 80px; }
- 
-  /* SECTION HEADERS */
-  .sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
-  .sec-head-line { flex: 1; height: 1px; background: var(--border); }
-  .sec-head-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
- 
-  /* SCROLLABLE TABLE */
-  .tbl-wrap { overflow-x: auto; }
-  .tbl-wrap::-webkit-scrollbar { height: 4px; }
-  .tbl-wrap::-webkit-scrollbar-track { background: var(--bg3); }
-  .tbl-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
- 
-  /* BOTTOM STRIP */
-  .bottom-strip {
-    background: var(--bg2); border-top: 1px solid var(--border);
-    padding: 10px 28px; display: flex; align-items: center; justify-content: space-between;
-    font-size: 11px; color: var(--muted);
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d3f;
+  --border:#2a3248;--border2:#344060;
+  --text:#e8ecf4;--text2:#8b97b4;--text3:#4d5d82;
+  --accent:#3b7cff;--accent2:#1a4fd6;
+  --green:#22c55e;--green-bg:rgba(34,197,94,.08);--green-border:rgba(34,197,94,.2);
+  --red:#ef4444;--red-bg:rgba(239,68,68,.08);--red-border:rgba(239,68,68,.2);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.08);--amber-border:rgba(245,158,11,.2);
+  --cyan:#06b6d4;--cyan-bg:rgba(6,182,212,.08);
+  --radius:8px;--radius2:12px;--sidebar:220px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:13px}
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);position:fixed;left:0;top:0;bottom:0;z-index:200;display:flex;flex-direction:column;overflow-y:auto}
+.sb-header{padding:20px 16px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-brand{display:flex;align-items:center;gap:9px}
+.sb-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-name{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.01em}
+.sb-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.sb-period{margin-top:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;font-size:10px;color:var(--text2)}
+.sb-period span{display:block;font-size:11px;color:var(--accent);font-weight:600;margin-top:2px}
+.sb-nav{padding:12px 8px;flex:1}
+.sb-section{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;padding:8px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:12px;font-weight:500;margin-bottom:1px;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(59,124,255,.12);color:var(--accent);border-left:2px solid var(--accent);padding-left:8px}
+.nav-icon{width:16px;text-align:center;font-size:14px}
+.sb-footer{padding:14px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-updated{font-size:10px;color:var(--text3);line-height:1.6}
+.sb-tag{display:inline-block;background:rgba(34,197,94,.1);border:1px solid var(--green-border);color:var(--green);font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;margin-bottom:4px;letter-spacing:.06em}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-size:14px;font-weight:700;color:var(--text)}
+.topbar-divider{width:1px;height:18px;background:var(--border2)}
+.topbar-breadcrumb{font-size:12px;color:var(--text3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-pill{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 12px;font-size:11px;color:var(--text2)}
+.tb-btn{background:var(--accent2);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
+.tb-btn:hover{background:var(--accent)}
+.tab-bar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto;flex-shrink:0}
+.tab-btn{padding:11px 16px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.tab-btn:hover{color:var(--text2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.content{padding:20px 24px;flex:1}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.banner{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 20px;display:flex;align-items:center;gap:0;margin-bottom:20px;overflow-x:auto;flex-wrap:wrap;gap:0}
+.banner-co{flex-shrink:0;margin-right:24px}
+.banner-co-name{font-size:13px;font-weight:700;color:var(--text)}
+.banner-co-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.banner-sep{width:1px;height:36px;background:var(--border2);margin:0 20px;flex-shrink:0}
+.banner-stat{text-align:right;flex:1;min-width:100px}
+.banner-stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+.banner-stat-value{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.02em;margin-top:2px}
+.banner-stat-chg{font-size:10px;font-weight:600;margin-top:3px}
+.up{color:var(--green)}.down{color:var(--red)}.flat{color:var(--amber)}
+.sec-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 16px;position:relative;overflow:hidden;transition:border-color .15s}
+.kpi:hover{border-color:var(--border2)}
+.kpi-accent{position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-accent.blue{background:var(--accent)}.kpi-accent.green{background:var(--green)}.kpi-accent.red{background:var(--red)}.kpi-accent.amber{background:var(--amber)}.kpi-accent.cyan{background:var(--cyan)}
+.kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.kpi-value{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.02em;line-height:1.1}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:4px}
+.kpi-chg{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;margin-top:7px;padding:2px 8px;border-radius:99px}
+.kpi-chg.up{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.kpi-chg.down{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.kpi-chg.flat{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 18px}
+.card-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.card-tag{font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:2px 7px;border-radius:4px}
+.chart-box{position:relative;height:200px}
+.chart-box.sm{height:160px}
+.chart-box.lg{height:240px}
+.chart-box.xl{height:300px}
+.bk-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.bk-row:last-child{border-bottom:none}
+.bk-name{font-size:11px;color:var(--text2);flex:0 0 160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-bar-wrap{flex:1;height:3px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.bk-bar{height:3px;border-radius:99px;transition:width .7s}
+.bk-bar.blue{background:var(--accent)}.bk-bar.green{background:var(--green)}.bk-bar.red{background:var(--red)}.bk-bar.amber{background:var(--amber)}.bk-bar.cyan{background:var(--cyan)}
+.bk-val{font-size:11px;font-weight:700;color:var(--text);flex:0 0 100px;text-align:right}
+.bk-pct{font-size:10px;color:var(--text3);flex:0 0 40px;text-align:right}
+.bank-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.bank-row:last-child{border-bottom:none}
+.bank-badge{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.bank-name{font-size:11px;color:var(--text2);flex:1}
+.bank-amount{font-size:12px;font-weight:700}
+.bank-amount.pos{color:var(--green)}.bank-amount.neg{color:var(--red)}
+.fin-table{width:100%;border-collapse:collapse;font-size:11px}
+.fin-table th{background:var(--bg3);padding:7px 12px;text-align:left;color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+.fin-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)}
+.fin-table tr:hover td{background:var(--bg3)}
+.fin-table tr.total td{color:var(--text);font-weight:700;background:var(--bg3)}
+.fin-table td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:var(--text)}
+.pill{display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:700}
+.pill.up{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.pill.down{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.pill.flat{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber)}
+.pill.high{background:rgba(239,68,68,.12);border:1px solid var(--red-border);color:var(--red)}
+.pill.medium{background:rgba(245,158,11,.12);border:1px solid var(--amber-border);color:var(--amber)}
+.pill.low{background:rgba(34,197,94,.12);border:1px solid var(--green-border);color:var(--green)}
+.pill.poor{background:rgba(239,68,68,.12);border:1px solid var(--red-border);color:var(--red)}
+.pill.watch{background:rgba(245,158,11,.12);border:1px solid var(--amber-border);color:var(--amber)}
+.pill.good{background:rgba(34,197,94,.12);border:1px solid var(--green-border);color:var(--green)}
+.ratio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ratio-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.ratio-val{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.ratio-lbl{font-size:10px;color:var(--text3);margin-top:4px}
+.ratio-status{font-size:9px;font-weight:700;margin-top:6px;padding:2px 8px;border-radius:99px;display:inline-block}
+.r-ok{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.r-warn{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber)}
+.r-bad{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:16px;align-items:center}
+.search-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 14px;color:var(--text);font-size:12px;outline:none}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--text3)}
+/* OVERDUE ALERT CARDS */
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px}
+.alert-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 16px;border-left:3px solid transparent}
+.alert-card.high{border-left-color:var(--red)}
+.alert-card.medium{border-left-color:var(--amber)}
+.alert-card.low-a{border-left-color:var(--green)}
+.alert-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+.alert-meta{display:flex;gap:10px;flex-wrap:wrap}
+.alert-item{font-size:10px;color:var(--text3)}
+.alert-item span{color:var(--text2);font-weight:600}
+/* PROGRESS BAR */
+.prog-wrap{height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:4px}
+.prog-bar{height:4px;border-radius:99px}
+/* TOP/BOTTOM TABLE */
+.top10-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
 </style>
 </head>
 <body>
- 
-<nav class="nav">
-  <div class="nav-brand">
-    <div class="nav-icon">📊</div>
-    <div>
-      <div class="nav-title">CFO Decision Engine</div>
-      <div class="nav-sub">Financial Nerve Center — Live Dashboard</div>
-    </div>
-  </div>
-  <div class="nav-right">
-    <span class="nav-date" id="navDate"></span>
-    <span class="live-badge"><span class="live-dot"></span>LIVE</span>
-  </div>
-</nav>
- 
-<div class="app-body">
- 
+
 <aside class="sidebar">
-  <div class="sidebar-section-label">Main Menu</div>
-  <div class="nav-item active" onclick="switchTab('overview', this)">
-    <div class="nav-icon-wrap">📈</div>
-    <span class="nav-item-text">Overview</span>
+  <div class="sb-header">
+    <div class="sb-brand">
+      <div class="sb-dot"></div>
+      <div>
+        <div class="sb-name">Green Crockery & Houseware</div>
+        <div class="sb-sub">(Pvt.) Limited</div>
+      </div>
+    </div>
+    <div class="sb-period">Financial Year<span>01 Jul 2024 – 30 Jun 2025</span></div>
   </div>
-  <div class="nav-item" onclick="switchTab('clients', this)">
-    <div class="nav-icon-wrap">👥</div>
-    <span class="nav-item-text">Client Analytics</span>
-  </div>
-  <div class="nav-item" onclick="switchTab('collections', this)">
-    <div class="nav-icon-wrap">💰</div>
-    <span class="nav-item-text">Collections</span>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section-label">Finance</div>
-  <div class="nav-item" onclick="switchTab('cashflow', this)">
-    <div class="nav-icon-wrap">🔄</div>
-    <span class="nav-item-text">Cash Flow</span>
-  </div>
-  <div class="nav-item" onclick="switchTab('alerts', this)">
-    <div class="nav-icon-wrap">🚨</div>
-    <span class="nav-item-text">Overdue Alerts</span>
-    <span class="nav-badge" id="sidebarAlertCount">9</span>
-  </div>
-  <div class="nav-item" onclick="switchTab('usd', this)">
-    <div class="nav-icon-wrap">💱</div>
-    <span class="nav-item-text">USD Impact</span>
+  <nav class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <button class="nav-item active" data-tab="overview" onclick="switchTab('overview',this)"><span class="nav-icon">◈</span> Executive Summary</button>
+    <div class="sb-section">Financials</div>
+    <button class="nav-item" data-tab="pl" onclick="switchTab('pl',this)"><span class="nav-icon">◉</span> Profit & Loss</button>
+    <div class="sb-section">Department Data</div>
+    <button class="nav-item" data-tab="stock" onclick="switchTab('stock',this)"><span class="nav-icon">▣</span> Stock in Trade</button>
+    <button class="nav-item" data-tab="payables" onclick="switchTab('payables',this)"><span class="nav-icon">▣</span> Trade & Other Payables</button>
+    <button class="nav-item" data-tab="tax" onclick="switchTab('tax',this)"><span class="nav-icon">▣</span> Tax & Advances</button>
+    <button class="nav-item" data-tab="borrowings" onclick="switchTab('borrowings',this)"><span class="nav-icon">▣</span> Short-Term Borrowings</button>
+    <button class="nav-item" data-tab="fixedassets" onclick="switchTab('fixedassets',this)"><span class="nav-icon">▣</span> Fixed Assets</button>
+    <div class="sb-section">Analysis</div>
+    <button class="nav-item" data-tab="cash" onclick="switchTab('cash',this)"><span class="nav-icon">◈</span> Cash & Banks</button>
+    <button class="nav-item" data-tab="ratios" onclick="switchTab('ratios',this)"><span class="nav-icon">◈</span> Ratios</button>
+    <button class="nav-item" data-tab="yoy" onclick="switchTab('yoy',this)"><span class="nav-icon">◈</span> YoY Comparison</button>
+    <div class="sb-section">Client Analytics</div>
+    <button class="nav-item" data-tab="rev-ranked" onclick="switchTab('rev-ranked',this)"><span class="nav-icon">★</span> Revenue Ranked</button>
+    <button class="nav-item" data-tab="outstanding" onclick="switchTab('outstanding',this)"><span class="nav-icon">★</span> Outstanding & Days</button>
+    <button class="nav-item" data-tab="collection" onclick="switchTab('collection',this)"><span class="nav-icon">★</span> Collection Efficiency</button>
+    <button class="nav-item" data-tab="overdue" onclick="switchTab('overdue',this)"><span class="nav-icon">★</span> Overdue Alerts</button>
+    <button class="nav-item" data-tab="margin" onclick="switchTab('margin',this)"><span class="nav-icon">★</span> Margin per Client</button>
+    <button class="nav-item" data-tab="top10" onclick="switchTab('top10',this)"><span class="nav-icon">★</span> Top 10 / Bottom 10</button>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-tag">LIVE</div>
+    <div class="sb-updated">FY2025 · 65 Clients<br>Updated: <span id="upd-time">—</span></div>
   </div>
 </aside>
- 
-<div class="content-area">
+
 <div class="main">
- 
-<!-- ═══════════════════════════════ OVERVIEW ═══════════════════════════════ -->
-<div class="section active" id="sec-overview">
-  <div class="kpi-grid" id="kpiGrid"></div>
- 
-  <div class="grid-65-35">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Revenue by Client — Ranked</div>
-          <div class="card-sub">All 15 clients · Invoice value vs received</div>
-        </div>
-        <span class="card-tag badge-amber">RANKED</span>
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="tb-title">Executive Summary</div>
+      <div class="topbar-divider"></div>
+      <div class="topbar-breadcrumb" id="tb-sub">CFO Dashboard · FY2025</div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-pill">PKR · Millions</div>
+      <div class="tb-pill" id="tb-date">—</div>
+      <button class="tb-btn" onclick="refreshData()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview',this)">Summary</button>
+    <button class="tab-btn" data-tab="pl" onclick="switchTab('pl',this)">P&L</button>
+    <button class="tab-btn" data-tab="stock" onclick="switchTab('stock',this)">Stock</button>
+    <button class="tab-btn" data-tab="payables" onclick="switchTab('payables',this)">Payables</button>
+    <button class="tab-btn" data-tab="tax" onclick="switchTab('tax',this)">Tax</button>
+    <button class="tab-btn" data-tab="borrowings" onclick="switchTab('borrowings',this)">Borrowings</button>
+    <button class="tab-btn" data-tab="fixedassets" onclick="switchTab('fixedassets',this)">Fixed Assets</button>
+    <button class="tab-btn" data-tab="cash" onclick="switchTab('cash',this)">Banks</button>
+    <button class="tab-btn" data-tab="ratios" onclick="switchTab('ratios',this)">Ratios</button>
+    <button class="tab-btn" data-tab="yoy" onclick="switchTab('yoy',this)">YoY</button>
+    <button class="tab-btn" data-tab="rev-ranked" onclick="switchTab('rev-ranked',this)">Rev. Ranked</button>
+    <button class="tab-btn" data-tab="outstanding" onclick="switchTab('outstanding',this)">Outstanding</button>
+    <button class="tab-btn" data-tab="collection" onclick="switchTab('collection',this)">Collection</button>
+    <button class="tab-btn" data-tab="overdue" onclick="switchTab('overdue',this)">Overdue ⚠</button>
+    <button class="tab-btn" data-tab="margin" onclick="switchTab('margin',this)">Margin</button>
+    <button class="tab-btn" data-tab="top10" onclick="switchTab('top10',this)">Top/Bot 10</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="banner">
+        <div class="banner-co"><div class="banner-co-name">Green Crockery & Houseware (Pvt.) Ltd</div><div class="banner-co-sub">CFO Executive Dashboard · FY2025</div></div>
+        <div class="banner-sep"></div>
+        <div class="banner-stat"><div class="banner-stat-label">Revenue</div><div class="banner-stat-value">Rs. 2,967M</div><div class="banner-stat-chg up">▲ 12.4% YoY</div></div>
+        <div class="banner-sep"></div>
+        <div class="banner-stat"><div class="banner-stat-label">Gross Profit</div><div class="banner-stat-value">Rs. 445M</div><div class="banner-stat-chg up">▲ 8.1%</div></div>
+        <div class="banner-sep"></div>
+        <div class="banner-stat"><div class="banner-stat-label">Net Profit</div><div class="banner-stat-value">Rs. 58M</div><div class="banner-stat-chg down">▼ 3.2%</div></div>
+        <div class="banner-sep"></div>
+        <div class="banner-stat"><div class="banner-stat-label">Client Revenue</div><div class="banner-stat-value">Rs. 3,734M</div><div class="banner-stat-chg up">65 Clients</div></div>
+        <div class="banner-sep"></div>
+        <div class="banner-stat"><div class="banner-stat-label">Outstanding AR</div><div class="banner-stat-value">Rs. 237M</div><div class="banner-stat-chg down">▼ 87.7% Eff.</div></div>
       </div>
-      <div class="card-body" style="padding:0">
-        <div class="tbl-wrap">
-          <table class="tbl" id="revenueRanked"></table>
-        </div>
+      <div class="sec-title">Key Performance Indicators</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Net Revenue</div><div class="kpi-value">2,967M</div><div class="kpi-sub">FY2025 Annual</div><div class="kpi-chg up">▲ 12.4% vs FY2024</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Gross Profit</div><div class="kpi-value">445M</div><div class="kpi-sub">Margin 15.0%</div><div class="kpi-chg up">▲ 8.1%</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Net Profit</div><div class="kpi-value">58M</div><div class="kpi-sub">Margin 1.95%</div><div class="kpi-chg down">▼ 3.2%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Cash & Bank (Net)</div><div class="kpi-value">−2,689M</div><div class="kpi-sub">Overdraft position</div><div class="kpi-chg flat">Overdrawn</div></div>
+        <div class="kpi"><div class="kpi-accent cyan"></div><div class="kpi-label">Total Client Rev.</div><div class="kpi-value">3,734M</div><div class="kpi-sub">65 active clients</div><div class="kpi-chg up">FY2025</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Total Collected</div><div class="kpi-value">3,273M</div><div class="kpi-sub">87.7% efficiency</div><div class="kpi-chg up">▲ Collection</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Outstanding AR</div><div class="kpi-value">237M</div><div class="kpi-sub">19 clients with AR</div><div class="kpi-chg down">Attention needed</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Trade Payables</div><div class="kpi-value">1,645M</div><div class="kpi-sub">Current liability</div><div class="kpi-chg down">▲ 9.2%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">ST Borrowings</div><div class="kpi-value">2,430M</div><div class="kpi-sub">Shareholder loans</div><div class="kpi-chg down">▲ 9.9%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Revenue · Gross Profit · Net Profit <span class="card-tag">Rs. M</span></div><div class="chart-box"><canvas id="c-overview-pl"></canvas></div></div>
+        <div class="card"><div class="card-title">Client Revenue — Top 5 <span class="card-tag">Rs. M</span></div><div class="chart-box"><canvas id="c-overview-clients"></canvas></div></div>
+      </div>
+      <div class="sec-title">Ratios at a Glance</div>
+      <div class="ratio-grid" style="margin-bottom:20px">
+        <div class="ratio-card"><div class="ratio-val">1.04x</div><div class="ratio-lbl">Current Ratio</div><div class="ratio-status r-warn">Tight</div></div>
+        <div class="ratio-card"><div class="ratio-val">0.14x</div><div class="ratio-lbl">Quick Ratio</div><div class="ratio-status r-bad">Low</div></div>
+        <div class="ratio-card"><div class="ratio-val">15.0%</div><div class="ratio-lbl">Gross Margin</div><div class="ratio-status r-warn">Moderate</div></div>
+        <div class="ratio-card"><div class="ratio-val">1.95%</div><div class="ratio-lbl">Net Margin</div><div class="ratio-status r-warn">Thin</div></div>
+        <div class="ratio-card"><div class="ratio-val">2.47x</div><div class="ratio-lbl">Debt-to-Equity</div><div class="ratio-status r-bad">High</div></div>
+        <div class="ratio-card"><div class="ratio-val">87.7%</div><div class="ratio-lbl">Collection Efficiency</div><div class="ratio-status r-warn">Watch</div></div>
       </div>
     </div>
- 
-    <div>
-      <!-- Working Capital Score -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-head">
-          <div class="card-title">Working Capital Score</div>
+
+    <!-- ═══ P&L ═══ -->
+    <div class="tab-panel" id="tab-pl">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Net Revenue</div><div class="kpi-value">2,967M</div><div class="kpi-chg up">▲ 12.4%</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">COGS</div><div class="kpi-value">2,522M</div><div class="kpi-sub">85.0% of revenue</div><div class="kpi-chg down">▲ 13.1%</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Gross Profit</div><div class="kpi-value">445M</div><div class="kpi-sub">Margin 15.0%</div><div class="kpi-chg up">▲ 8.1%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Operating Expenses</div><div class="kpi-value">354M</div><div class="kpi-sub">Admin + selling</div><div class="kpi-chg flat">—</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">EBIT</div><div class="kpi-value">91M</div><div class="kpi-sub">EBIT margin 3.07%</div><div class="kpi-chg up">▲ 5.2%</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Net Profit (PAT)</div><div class="kpi-value">58M</div><div class="kpi-sub">Margin 1.95%</div><div class="kpi-chg down">▼ 3.2%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">P&L Breakdown <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-pl-bar"></canvas></div></div>
+        <div class="card"><div class="card-title">Margin Trend <span class="card-tag">%</span></div><div class="chart-box lg"><canvas id="c-pl-margins"></canvas></div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Income Statement Detail</div>
+        <table class="fin-table">
+          <thead><tr><th>Line Item</th><th>FY2025</th><th>FY2024</th><th>Change</th></tr></thead>
+          <tbody>
+            <tr><td>Net Revenue</td><td class="num">2,967,000,000</td><td class="num">2,640,000,000</td><td><span class="pill up">▲ 12.4%</span></td></tr>
+            <tr><td>Cost of Goods Sold</td><td class="num">(2,522,000,000)</td><td class="num">(2,228,000,000)</td><td><span class="pill down">▲ 13.1%</span></td></tr>
+            <tr class="total"><td>Gross Profit</td><td class="num">445,000,000</td><td class="num">412,000,000</td><td><span class="pill up">▲ 8.1%</span></td></tr>
+            <tr><td>Admin Expenses</td><td class="num">(218,000,000)</td><td class="num">(196,000,000)</td><td><span class="pill down">▲ 11.2%</span></td></tr>
+            <tr><td>Selling & Dist. Expenses</td><td class="num">(136,000,000)</td><td class="num">(129,000,000)</td><td><span class="pill down">▲ 5.4%</span></td></tr>
+            <tr class="total"><td>Operating Profit (EBIT)</td><td class="num">91,000,000</td><td class="num">86,500,000</td><td><span class="pill up">▲ 5.2%</span></td></tr>
+            <tr><td>Finance Costs</td><td class="num">(24,000,000)</td><td class="num">(19,500,000)</td><td><span class="pill down">▲ 23.1%</span></td></tr>
+            <tr><td>Other Income</td><td class="num">8,400,000</td><td class="num">7,200,000</td><td><span class="pill up">▲ 16.7%</span></td></tr>
+            <tr><td>Net Profit Before Tax</td><td class="num">75,400,000</td><td class="num">74,200,000</td><td><span class="pill up">▲ 1.6%</span></td></tr>
+            <tr><td>Taxation</td><td class="num">(17,400,000)</td><td class="num">(14,200,000)</td><td><span class="pill down">▲ 22.5%</span></td></tr>
+            <tr class="total"><td>Net Profit After Tax</td><td class="num">58,000,000</td><td class="num">60,000,000</td><td><span class="pill down">▼ 3.2%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ STOCK ═══ -->
+    <div class="tab-panel" id="tab-stock">
+      <div class="sec-title">Stock in Trade — Department Breakdown</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent cyan"></div><div class="kpi-label">Total Stock in Trade</div><div class="kpi-value">7,293M</div><div class="kpi-sub">FY2025</div><div class="kpi-chg up">▲ 4.3% YoY</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Finished Goods</div><div class="kpi-value">3,400M</div><div class="kpi-sub">46.6%</div><div class="kpi-chg up">▲ 5.1%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Raw Material</div><div class="kpi-value">2,840M</div><div class="kpi-sub">38.9%</div><div class="kpi-chg up">▲ 3.2%</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Work in Process</div><div class="kpi-value">620M</div><div class="kpi-sub">8.5%</div><div class="kpi-chg flat">— Stable</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Stores & Spares</div><div class="kpi-value">433M</div><div class="kpi-sub">5.9%</div><div class="kpi-chg down">▼ 1.1%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Category Breakdown <span class="card-tag">Rs. M</span></div><div id="stock-bk"></div></div>
+        <div class="card"><div class="card-title">Composition <span class="card-tag">%</span></div><div class="chart-box"><canvas id="c-stock-pie"></canvas></div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px"><div class="card-title">YoY Stock Movement</div><div class="chart-box"><canvas id="c-stock-yoy"></canvas></div></div>
+    </div>
+
+    <!-- ═══ PAYABLES ═══ -->
+    <div class="tab-panel" id="tab-payables">
+      <div class="sec-title">Trade & Other Payables</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Total Payables</div><div class="kpi-value">1,645M</div><div class="kpi-chg down">▲ 9.2%</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Local Creditors</div><div class="kpi-value">840M</div><div class="kpi-sub">51.1%</div><div class="kpi-chg down">▲ 8.4%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Contract Liabilities</div><div class="kpi-value">320M</div><div class="kpi-sub">19.5%</div><div class="kpi-chg down">▲ 12.3%</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Foreign Creditors</div><div class="kpi-value">280M</div><div class="kpi-sub">17.0%</div><div class="kpi-chg flat">▲ 2.1%</div></div>
+        <div class="kpi"><div class="kpi-accent cyan"></div><div class="kpi-label">Accrued Expenses</div><div class="kpi-value">186M</div><div class="kpi-sub">11.3%</div><div class="kpi-chg up">▲ 5.9%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Payables Breakdown<span class="card-tag">Rs. M</span></div><div id="payables-bk"></div></div>
+        <div class="card"><div class="card-title">Composition<span class="card-tag">%</span></div><div class="chart-box"><canvas id="c-pay-pie"></canvas></div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px"><div class="card-title">Payables Aging Estimate<span class="card-tag">Rs. M</span></div><div class="chart-box"><canvas id="c-pay-aging"></canvas></div></div>
+    </div>
+
+    <!-- ═══ TAX ═══ -->
+    <div class="tab-panel" id="tab-tax">
+      <div class="sec-title">Tax & Advance Receivables</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Total Tax & Advances</div><div class="kpi-value">580M</div><div class="kpi-chg up">▲ 6.1%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Advance Income Tax</div><div class="kpi-value">198M</div><div class="kpi-sub">34.1%</div><div class="kpi-chg up">▲ 8.2%</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Sales Tax Receivable</div><div class="kpi-value">142M</div><div class="kpi-sub">24.5%</div><div class="kpi-chg up">▲ 4.4%</div></div>
+        <div class="kpi"><div class="kpi-accent cyan"></div><div class="kpi-label">Advances to Suppliers</div><div class="kpi-value">184M</div><div class="kpi-sub">31.7%</div><div class="kpi-chg up">▲ 7.0%</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Prepaid Expenses</div><div class="kpi-value">56M</div><div class="kpi-sub">9.7%</div><div class="kpi-chg flat">▲ 1.8%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Tax & Advances Breakdown<span class="card-tag">Rs. M</span></div><div id="tax-bk"></div></div>
+        <div class="card"><div class="card-title">Composition<span class="card-tag">%</span></div><div class="chart-box"><canvas id="c-tax-pie"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ═══ BORROWINGS ═══ -->
+    <div class="tab-panel" id="tab-borrowings">
+      <div class="sec-title">Short-Term Borrowings</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Total ST Borrowings</div><div class="kpi-value">2,430M</div><div class="kpi-chg down">▲ 9.9%</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Mr. Zhang Qi</div><div class="kpi-value">960M</div><div class="kpi-sub">39.5%</div><div class="kpi-chg down">▲ 10.3%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Mr. Tu Chuanfu</div><div class="kpi-value">870M</div><div class="kpi-sub">35.8%</div><div class="kpi-chg down">▲ 9.4%</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Time Ceramics</div><div class="kpi-value">600M</div><div class="kpi-sub">24.7%</div><div class="kpi-chg down">▲ 10.0%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Lender Breakdown<span class="card-tag">Rs. M</span></div><div id="borrowings-bk"></div></div>
+        <div class="card"><div class="card-title">Lender Exposure<span class="card-tag">%</span></div><div class="chart-box"><canvas id="c-bor-pie"></canvas></div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Borrowings Detail</div>
+        <table class="fin-table">
+          <thead><tr><th>Lender</th><th>FY2025</th><th>FY2024</th><th>Type</th><th>YoY</th></tr></thead>
+          <tbody>
+            <tr><td>Mr. Zhang Qi</td><td class="num">960,000,000</td><td class="num">870,000,000</td><td><span class="pill flat">Director Loan</span></td><td><span class="pill down">▲ 10.3%</span></td></tr>
+            <tr><td>Mr. Tu Chuanfu</td><td class="num">870,000,000</td><td class="num">795,000,000</td><td><span class="pill flat">Director Loan</span></td><td><span class="pill down">▲ 9.4%</span></td></tr>
+            <tr><td>Time Ceramics (Pvt) Ltd</td><td class="num">600,000,000</td><td class="num">545,000,000</td><td><span class="pill flat">Related Party</span></td><td><span class="pill down">▲ 10.0%</span></td></tr>
+            <tr class="total"><td>Total</td><td class="num">2,430,000,000</td><td class="num">2,210,000,000</td><td></td><td><span class="pill down">▲ 9.9%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ FIXED ASSETS ═══ -->
+    <div class="tab-panel" id="tab-fixedassets">
+      <div class="sec-title">Fixed Assets</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Total NCA</div><div class="kpi-value">420M</div><div class="kpi-chg flat">▲ 2.4%</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">PP&E (Net)</div><div class="kpi-value">398M</div><div class="kpi-sub">94.8% NCA</div><div class="kpi-chg flat">▲ 2.6%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Depreciation (Annual)</div><div class="kpi-value">43M</div><div class="kpi-chg flat">—</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">PP&E (Gross)</div><div class="kpi-value">841M</div><div class="kpi-chg flat">—</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Accumulated Dep.</div><div class="kpi-value">443M</div><div class="kpi-chg flat">—</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-title">Fixed Asset Breakdown<span class="card-tag">Rs. M</span></div><div id="ppe-bk"></div></div>
+        <div class="card"><div class="card-title">PP&E vs Depreciation<span class="card-tag">Rs. M</span></div><div class="chart-box"><canvas id="c-ppe-bar"></canvas></div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">PP&E Schedule</div>
+        <table class="fin-table">
+          <thead><tr><th>Asset Category</th><th>Gross Value</th><th>Accum. Dep.</th><th>Net Book Value</th><th>Dep. Rate</th></tr></thead>
+          <tbody>
+            <tr><td>Buildings & Civil Works</td><td class="num">310M</td><td class="num">142M</td><td class="num">168M</td><td>5%</td></tr>
+            <tr><td>Plant & Machinery</td><td class="num">380M</td><td class="num">230M</td><td class="num">150M</td><td>10%</td></tr>
+            <tr><td>Furniture & Fixtures</td><td class="num">48M</td><td class="num">34M</td><td class="num">14M</td><td>10%</td></tr>
+            <tr><td>Vehicles</td><td class="num">78M</td><td class="num">22M</td><td class="num">56M</td><td>20%</td></tr>
+            <tr><td>Office Equipment</td><td class="num">25M</td><td class="num">15M</td><td class="num">10M</td><td>20%</td></tr>
+            <tr class="total"><td>Total PP&E</td><td class="num">841M</td><td class="num">443M</td><td class="num">398M</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CASH ═══ -->
+    <div class="tab-panel" id="tab-cash">
+      <div class="sec-title">Cash & Bank Accounts</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Net Bank Position</div><div class="kpi-value">−2,689M</div><div class="kpi-chg down">Overdraft</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Positive Balances</div><div class="kpi-value">+1,274M</div><div class="kpi-sub">Soneri + HBL</div><div class="kpi-chg up">2 accounts</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Overdrawn</div><div class="kpi-value">−3,963M</div><div class="kpi-sub">4 accounts</div><div class="kpi-chg down">Attention</div></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Bank Account Balances</div>
+        <div class="bank-row"><div class="bank-badge">SB</div><div class="bank-name">Soneri Bank FSD — 2233</div><div class="bank-amount pos">+Rs. 1,203,909</div></div>
+        <div class="bank-row"><div class="bank-badge">MB</div><div class="bank-name">Meezan Bank FSD — 3484</div><div class="bank-amount neg">−Rs. 2,296,129,751</div></div>
+        <div class="bank-row"><div class="bank-badge">HB</div><div class="bank-name">HBL FSD — 8303</div><div class="bank-amount pos">+Rs. 69,566,204</div></div>
+        <div class="bank-row"><div class="bank-badge">MC</div><div class="bank-name">MCB FSD — 5694</div><div class="bank-amount neg">−Rs. 61,759,524</div></div>
+        <div class="bank-row"><div class="bank-badge">HM</div><div class="bank-name">Habib Metro FSD — 3421</div><div class="bank-amount neg">−Rs. 8,615,000</div></div>
+        <div class="bank-row"><div class="bank-badge">AF</div><div class="bank-name">Bank Alfalah</div><div class="bank-amount neg">−Rs. 370,181,703</div></div>
+      </div>
+      <div class="card"><div class="card-title">Bank Balances Chart<span class="card-tag">Rs.</span></div><div class="chart-box"><canvas id="c-banks"></canvas></div></div>
+    </div>
+
+    <!-- ═══ RATIOS ═══ -->
+    <div class="tab-panel" id="tab-ratios">
+      <div class="sec-title">Financial Ratios</div>
+      <div class="grid-3">
+        <div class="card"><div class="card-title">Liquidity</div>
+          <div class="ratio-card" style="margin-bottom:10px"><div class="ratio-val">1.04x</div><div class="ratio-lbl">Current Ratio</div><div class="ratio-status r-warn">⚠ Tight</div></div>
+          <div class="ratio-card"><div class="ratio-val">0.14x</div><div class="ratio-lbl">Quick Ratio</div><div class="ratio-status r-bad">Low</div></div>
         </div>
-        <div class="card-body">
-          <div class="score-wrap" id="wcScore"></div>
-          <div id="wcBreakdown"></div>
+        <div class="card"><div class="card-title">Profitability</div>
+          <div class="ratio-card" style="margin-bottom:10px"><div class="ratio-val">15.0%</div><div class="ratio-lbl">Gross Profit Margin</div><div class="ratio-status r-warn">Moderate</div></div>
+          <div class="ratio-card"><div class="ratio-val">1.95%</div><div class="ratio-lbl">Net Profit Margin</div><div class="ratio-status r-warn">Thin</div></div>
+        </div>
+        <div class="card"><div class="card-title">Leverage</div>
+          <div class="ratio-card" style="margin-bottom:10px"><div class="ratio-val">2.47x</div><div class="ratio-lbl">Debt-to-Equity</div><div class="ratio-status r-bad">High</div></div>
+          <div class="ratio-card"><div class="ratio-val">Rs. 195M</div><div class="ratio-lbl">Working Capital</div><div class="ratio-status r-ok">Positive</div></div>
         </div>
       </div>
- 
-      <!-- Collection Efficiency -->
+      <div class="card"><div class="card-title">Ratio Trends FY2023–2025</div><div class="chart-box lg"><canvas id="c-ratio-trend"></canvas></div></div>
+    </div>
+
+    <!-- ═══ YOY ═══ -->
+    <div class="tab-panel" id="tab-yoy">
+      <div class="sec-title">Year-on-Year Comparison</div>
+      <div class="card" style="margin-bottom:14px"><div class="card-title">Revenue & Profit Trend <span class="card-tag">FY2023–2025</span></div><div class="chart-box lg"><canvas id="c-yoy-trend"></canvas></div></div>
       <div class="card">
-        <div class="card-head">
-          <div class="card-title">Collection Efficiency</div>
-          <div class="card-sub">Per client %</div>
-        </div>
-        <div class="card-body" id="collEffCard"></div>
+        <div class="card-title">YoY Summary</div>
+        <table class="fin-table">
+          <thead><tr><th>Metric</th><th>FY2025</th><th>FY2024</th><th>FY2023</th><th>YoY</th></tr></thead>
+          <tbody>
+            <tr><td>Revenue</td><td class="num">Rs. 2,967M</td><td class="num">Rs. 2,640M</td><td class="num">Rs. 2,310M</td><td><span class="pill up">▲ 12.4%</span></td></tr>
+            <tr><td>Gross Profit</td><td class="num">Rs. 445M</td><td class="num">Rs. 412M</td><td class="num">Rs. 380M</td><td><span class="pill up">▲ 8.1%</span></td></tr>
+            <tr><td>Net Profit</td><td class="num">Rs. 58M</td><td class="num">Rs. 60M</td><td class="num">Rs. 54M</td><td><span class="pill down">▼ 3.2%</span></td></tr>
+            <tr><td>Total Assets</td><td class="num">Rs. 7,293M</td><td class="num">Rs. 6,905M</td><td class="num">Rs. 6,520M</td><td><span class="pill up">▲ 5.6%</span></td></tr>
+            <tr><td>Trade Payables</td><td class="num">Rs. 1,645M</td><td class="num">Rs. 1,507M</td><td class="num">Rs. 1,350M</td><td><span class="pill down">▲ 9.2%</span></td></tr>
+            <tr><td>ST Borrowings</td><td class="num">Rs. 2,430M</td><td class="num">Rs. 2,210M</td><td class="num">Rs. 1,980M</td><td><span class="pill down">▲ 9.9%</span></td></tr>
+            <tr><td>Gross Margin %</td><td class="num">15.0%</td><td class="num">15.6%</td><td class="num">16.4%</td><td><span class="pill down">▼ 0.6pp</span></td></tr>
+            <tr><td>Net Margin %</td><td class="num">1.95%</td><td class="num">2.27%</td><td class="num">2.34%</td><td><span class="pill down">▼ 0.3pp</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
-</div>
- 
-<!-- ═══════════════════════════════ CLIENTS ═══════════════════════════════ -->
-<div class="section" id="sec-clients">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-head">
-        <div>
+
+    <!-- ═══ CLIENT: REVENUE RANKED ═══ -->
+    <div class="tab-panel" id="tab-rev-ranked">
+      <div class="sec-title">Per Client Revenue — Ranked FY2025</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Total Client Revenue</div><div class="kpi-value">3,734M</div><div class="kpi-sub">FY2025</div><div class="kpi-chg up">65 Clients</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">#1 Client</div><div class="kpi-value">491M</div><div class="kpi-sub">FARHAN BROTHER</div><div class="kpi-chg up">13.15% share</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Top 3 Concentration</div><div class="kpi-value">35.8%</div><div class="kpi-sub">of total revenue</div><div class="kpi-chg flat">Concentrated</div></div>
+        <div class="kpi"><div class="kpi-accent cyan"></div><div class="kpi-label">Top 10 Concentration</div><div class="kpi-value">66.7%</div><div class="kpi-sub">of total revenue</div><div class="kpi-chg flat">Watch</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card"><div class="card-title">Top 10 Clients by Revenue <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-rev-top10"></canvas></div></div>
+        <div class="card"><div class="card-title">Revenue Concentration <span class="card-tag">Top 10 vs Rest</span></div><div class="chart-box lg"><canvas id="c-rev-conc"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">All 65 Clients — Revenue Ranked <span class="card-tag">FY2025</span></div>
+        <div class="search-bar"><input class="search-input" id="rev-search" placeholder="Search client name…" oninput="filterTable('rev-tbl',this.value,1)"></div>
+        <table class="fin-table" id="rev-tbl">
+          <thead><tr><th>Rank</th><th>Client Name</th><th>Revenue (PKR)</th><th>% of Total</th><th>Cumulative %</th></tr></thead>
+          <tbody id="rev-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENT: OUTSTANDING & DAYS ═══ -->
+    <div class="tab-panel" id="tab-outstanding">
+      <div class="sec-title">Per Client Outstanding AR with Estimated Days</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Total Outstanding AR</div><div class="kpi-value">237M</div><div class="kpi-sub">19 clients</div><div class="kpi-chg down">Requires action</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Highest AR</div><div class="kpi-value">43.4M</div><div class="kpi-sub">Temp/Seasonal</div><div class="kpi-chg down">118 days DSO</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">HIGH Risk Clients</div><div class="kpi-value">10</div><div class="kpi-sub">DSO > 90 days</div><div class="kpi-chg down">Urgent</div></div>
+        <div class="kpi"><div class="kpi-accent flat"></div><div class="kpi-label">MEDIUM Risk Clients</div><div class="kpi-value">5</div><div class="kpi-sub">DSO 45–90 days</div><div class="kpi-chg flat">Monitor</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card"><div class="card-title">Outstanding AR by Client (Top 10) <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-outstanding-bar"></canvas></div></div>
+        <div class="card"><div class="card-title">DSO by Client <span class="card-tag">Days</span></div><div class="chart-box lg"><canvas id="c-dso-bar"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Outstanding AR Detail <span class="card-tag">DSO-based estimation</span></div>
+        <div class="search-bar"><input class="search-input" id="out-search" placeholder="Search client…" oninput="filterTable('out-tbl',this.value,1)"></div>
+        <table class="fin-table" id="out-tbl">
+          <thead><tr><th>#</th><th>Client Name</th><th>Revenue (PKR)</th><th>Collected (PKR)</th><th>Outstanding (PKR)</th><th>DSO (Days)</th><th>Risk</th></tr></thead>
+          <tbody id="out-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENT: COLLECTION EFFICIENCY ═══ -->
+    <div class="tab-panel" id="tab-collection">
+      <div class="sec-title">Collection Efficiency % per Client</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Company Avg. Efficiency</div><div class="kpi-value">87.7%</div><div class="kpi-sub">Collected / Billed</div><div class="kpi-chg flat">FY2025</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">POOR (&lt;70%)</div><div class="kpi-value">23</div><div class="kpi-sub">clients</div><div class="kpi-chg down">Below 70%</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">WATCH (70–90%)</div><div class="kpi-value">13</div><div class="kpi-sub">clients</div><div class="kpi-chg flat">Monitor</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">GOOD (90%+)</div><div class="kpi-value">29</div><div class="kpi-sub">clients</div><div class="kpi-chg up">Healthy</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card"><div class="card-title">Collection Status Distribution <span class="card-tag">Clients</span></div><div class="chart-box"><canvas id="c-coll-pie"></canvas></div></div>
+        <div class="card"><div class="card-title">Bottom 10 — Worst Efficiency <span class="card-tag">%</span></div><div class="chart-box"><canvas id="c-coll-worst"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">All Clients — Collection Efficiency <span class="card-tag">Sorted by Efficiency</span></div>
+        <div class="search-bar"><input class="search-input" id="coll-search" placeholder="Search client…" oninput="filterTable('coll-tbl',this.value,1)"></div>
+        <table class="fin-table" id="coll-tbl">
+          <thead><tr><th>Rank</th><th>Client Name</th><th>Revenue (PKR)</th><th>Collected (PKR)</th><th>Efficiency %</th><th>Status</th></tr></thead>
+          <tbody id="coll-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENT: OVERDUE ALERTS ═══ -->
+    <div class="tab-panel" id="tab-overdue">
+      <div class="sec-title">Overdue Alerts — Clients Requiring Collection Action</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">🔴 HIGH Risk</div><div class="kpi-value">10</div><div class="kpi-sub">DSO &gt; 90 days</div><div class="kpi-chg down">Urgent</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">🟡 MEDIUM Risk</div><div class="kpi-value">5</div><div class="kpi-sub">DSO 45–90 days</div><div class="kpi-chg flat">Monitor</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">🟢 LOW Risk</div><div class="kpi-value">4</div><div class="kpi-sub">DSO &lt; 45 days</div><div class="kpi-chg up">OK</div></div>
+        <div class="kpi"><div class="kpi-accent red"></div><div class="kpi-label">Total At-Risk AR</div><div class="kpi-value">237M</div><div class="kpi-sub">Across 19 clients</div><div class="kpi-chg down">Exposure</div></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">🔴 HIGH Risk — Immediate Action Required</div>
+        <div class="alert-grid" id="high-alerts"></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">🟡 MEDIUM Risk — Monitor Closely</div>
+        <div class="alert-grid" id="medium-alerts"></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">🟢 LOW Risk</div>
+        <div class="alert-grid" id="low-alerts"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Outstanding AR vs DSO — At-Risk Clients <span class="card-tag">Rs. M</span></div>
+        <div class="chart-box xl"><canvas id="c-overdue-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENT: MARGIN PER CLIENT ═══ -->
+    <div class="tab-panel" id="tab-margin">
+      <div class="sec-title">Estimated Gross Margin per Client</div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Company Gross Margin</div><div class="kpi-value">9.99%</div><div class="kpi-sub">Applied uniformly</div><div class="kpi-chg flat">Estimate</div></div>
+        <div class="kpi"><div class="kpi-accent blue"></div><div class="kpi-label">Total Est. Gross Profit</div><div class="kpi-value">373M</div><div class="kpi-sub">All 65 clients</div><div class="kpi-chg up">FY2025</div></div>
+        <div class="kpi"><div class="kpi-accent green"></div><div class="kpi-label">Highest GP Client</div><div class="kpi-value">49.0M</div><div class="kpi-sub">FARHAN BROTHER</div><div class="kpi-chg up">Top contributor</div></div>
+        <div class="kpi"><div class="kpi-accent amber"></div><div class="kpi-label">Note</div><div class="kpi-value">10.0%</div><div class="kpi-sub">Uniform margin est.</div><div class="kpi-chg flat">See note</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card"><div class="card-title">Top 10 — Est. Gross Profit <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-margin-bar"></canvas></div></div>
+        <div class="card"><div class="card-title">Revenue vs Est. GP — Top 10 <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-margin-compare"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Margin per Client — Full List <span class="card-tag">Uniform 9.99% applied</span></div>
+        <div class="search-bar"><input class="search-input" id="margin-search" placeholder="Search client…" oninput="filterTable('margin-tbl',this.value,1)"></div>
+        <table class="fin-table" id="margin-tbl">
+          <thead><tr><th>Rank</th><th>Client Name</th><th>Revenue (PKR)</th><th>Est. COGS (PKR)</th><th>Est. Gross Profit (PKR)</th><th>GM %</th></tr></thead>
+          <tbody id="margin-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENT: TOP 10 / BOTTOM 10 ═══ -->
+    <div class="tab-panel" id="tab-top10">
+      <div class="sec-title">Top 10 & Bottom 10 Clients by Revenue FY2025</div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card"><div class="card-title">Top 10 — Revenue <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-top10-bar"></canvas></div></div>
+        <div class="card"><div class="card-title">Bottom 10 — Revenue <span class="card-tag">Rs. M</span></div><div class="chart-box lg"><canvas id="c-bot10-bar"></canvas></div></div>
+      </div>
+      <div class="top10-grid">
+        <div class="card">
           <div class="card-title">🏆 Top 10 Clients</div>
-          <div class="card-sub">By total revenue</div>
+          <table class="fin-table">
+            <thead><tr><th>#</th><th>Client</th><th>Revenue (PKR)</th><th>AR (PKR)</th><th>Eff. %</th></tr></thead>
+            <tbody id="top10-tbody"></tbody>
+          </table>
         </div>
-        <span class="card-tag" style="background:rgba(0,229,160,0.12);color:var(--green);border:1px solid rgba(0,229,160,0.25)">TOP 10</span>
-      </div>
-      <div class="card-body" id="top10"></div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div>
+        <div class="card">
           <div class="card-title">📉 Bottom 10 Clients</div>
-          <div class="card-sub">Needs attention</div>
+          <table class="fin-table">
+            <thead><tr><th>#</th><th>Client</th><th>Revenue (PKR)</th><th>AR (PKR)</th><th>Eff. %</th></tr></thead>
+            <tbody id="bot10-tbody"></tbody>
+          </table>
         </div>
-        <span class="card-tag badge-amber">BOTTOM 10</span>
-      </div>
-      <div class="card-body" id="bottom10"></div>
-    </div>
-  </div>
- 
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Margin per Client</div>
-      <div class="card-sub">Gross profit margin % — profitability ranking</div>
-    </div>
-    <div class="card-body" id="marginCard"></div>
-  </div>
-</div>
- 
-<!-- ═══════════════════════════════ COLLECTIONS ═══════════════════════════════ -->
-<div class="section" id="sec-collections">
-  <div class="kpi-grid" id="collKpi"></div>
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Outstanding per Client — With Aging</div>
-      <div class="card-sub">Days overdue · Amount outstanding · Recovery risk</div>
-    </div>
-    <div class="card-body" style="padding:0">
-      <div class="tbl-wrap">
-        <table class="tbl" id="outstandingTable"></table>
       </div>
     </div>
-  </div>
-</div>
- 
-<!-- ═══════════════════════════════ CASH FLOW ═══════════════════════════════ -->
-<div class="section" id="sec-cashflow">
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-head">
-      <div class="card-title">Cash Flow Forecast — 30 / 60 / 90 Days</div>
-      <div class="card-sub">Net cash position projection based on outstanding receivables</div>
-    </div>
-    <div class="card-body" id="cfForecast"></div>
-  </div>
-  <div class="grid-3" id="cfGrid"></div>
-</div>
- 
-<!-- ═══════════════════════════════ ALERTS ═══════════════════════════════ -->
-<div class="section" id="sec-alerts">
-  <div class="card">
-    <div class="card-head">
-      <div>
-        <div class="card-title">🚨 Automatic Overdue Alerts</div>
-        <div class="card-sub">Clients past due date — sorted by severity</div>
-      </div>
-      <span id="alertCount" class="card-tag badge-red"></span>
-    </div>
-    <div class="card-body" id="alertsList"></div>
-  </div>
-</div>
- 
-<!-- ═══════════════════════════════ USD TRACKER ═══════════════════════════════ -->
-<div class="section" id="sec-usd">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title">💱 USD/PKR Impact Tracker</div>
-        <div class="card-sub">Adjust exchange rate — see PKR cost impact instantly</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:12px;font-size:12px;color:var(--muted)">Current rate used in data: <span style="color:var(--cyan);font-family:'DM Mono',monospace;font-weight:600">283.76 PKR/USD</span></div>
-        <div class="fx-input-row">
-          <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">USD Exposure (USD)</div>
-            <input class="fx-input" id="fxUSD" type="number" value="17113" placeholder="USD amount">
-          </div>
-          <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">New USD/PKR Rate</div>
-            <input class="fx-input" id="fxRate" type="number" value="283.76" placeholder="Rate">
-          </div>
-          <div style="margin-top:20px">
-            <button class="fx-btn" onclick="calcFX()">Calculate</button>
-          </div>
-        </div>
-        <div id="fxResult"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title">Rate Sensitivity Analysis</div>
-        <div class="card-sub">PKR cost at different exchange rates</div>
-      </div>
-      <div class="card-body" id="fxSensitivity"></div>
-    </div>
-  </div>
-</div>
- 
-</div><!-- main -->
-</div><!-- content-area -->
-</div><!-- app-body -->
- 
-<div class="bottom-strip">
-  <span>CFO Decision Engine v2.0 — Hamza Bhai Data</span>
-  <span id="bottomDate"></span>
-</div>
- 
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
 <script>
-// ── DATA ────────────────────────────────────────────────────────────────────
-const RAW_DATA = [
-  {name:"Mujtaba Crockery Store",revenue:4555343,cogs:3200000,received:0,due:"2026-02-15",invoice:"2026-01-15",status:"Unpaid"},
-  {name:"Sinoglass Trading Pvt Ltd",revenue:1850000,cogs:1100000,received:1850000,due:"2026-03-01",invoice:"2026-02-01",status:"Paid"},
-  {name:"Fancy Glass Ware Crockery",revenue:1200000,cogs:720000,received:0,due:"2026-04-15",invoice:"2026-03-15",status:"Unpaid"},
-  {name:"Waqar Trader",revenue:920000,cogs:680000,received:300000,due:"2026-03-10",invoice:"2026-02-10",status:"Partial"},
-  {name:"Umar Farooq",revenue:780000,cogs:480000,received:400000,due:"2026-04-01",invoice:"2026-03-01",status:"Partial"},
-  {name:"Mudassar Crockery Store",revenue:680000,cogs:490000,received:0,due:"2026-03-20",invoice:"2026-02-20",status:"Unpaid"},
-  {name:"Gujrat Bartan Store",revenue:650000,cogs:450000,received:650000,due:"2026-03-15",invoice:"2026-02-15",status:"Paid"},
-  {name:"Qazi Brothers Plastic",revenue:560000,cogs:390000,received:200000,due:"2026-05-20",invoice:"2026-04-20",status:"Partial"},
-  {name:"HAA Traders",revenue:430000,cogs:350000,received:0,due:"2026-05-15",invoice:"2026-04-15",status:"Unpaid"},
-  {name:"Azaz Crockery",revenue:410000,cogs:300000,received:100000,due:"2026-04-25",invoice:"2026-03-25",status:"Partial"},
-  {name:"Ahmad Enterprises",revenue:340000,cogs:310000,received:0,due:"2026-01-01",invoice:"2025-12-01",status:"Unpaid"},
-  {name:"Usman Enterprises",revenue:320000,cogs:240000,received:0,due:"2026-06-10",invoice:"2026-05-10",status:"Unpaid"},
-  {name:"Imran Variety Center",revenue:290000,cogs:220000,received:150000,due:"2026-06-09",invoice:"2026-05-09",status:"Partial"},
-  {name:"Bartan Markaz",revenue:250000,cogs:190000,received:0,due:"2026-06-15",invoice:"2026-05-15",status:"Unpaid"},
-  {name:"Madni Traders",revenue:180000,cogs:160000,received:0,due:"2026-06-20",invoice:"2026-05-20",status:"Unpaid"},
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+const revRanked = [
+  [1,'FARHAN BROTHER',491117300,13.15],[2,'USMAN ENTERPRISES',444100972,11.89],[3,'POS Retail Shops',401900213,10.76],
+  [4,'JAMEEL AKHTER INTERNATIONAL',255560817,6.84],[5,'Khawaja Crockery',177800075,4.76],[6,'Munir Ahmed Plastic Dealer',165700119,4.44],
+  [7,'CKT CROCKERY',158624928,4.25],[8,'Hassan Paradise',145291903,3.89],[9,'Temporary or Seasonal Customer',133693501,3.58],
+  [10,'BARTAN MARKAZ',118251944,3.17],[11,'AB International Trading Compan',117826651,3.16],[12,'Mehmood & Brothers',109749919,2.94],
+  [13,'GULZAMAN CROCKERY STORE',91954673,2.46],[14,'Pasban Crockery',74000000,1.98],[15,'IMRAN VARIETY CENTER',73733792,1.97],
+  [16,'WAQAR TRADERS',61347560,1.64],[17,'HYK Traders',52741465,1.41],[18,'Gul Age Crockery',44050000,1.18],
+  [19,'SINOPAK BRIDGE (PVT.) LTD',43739001,1.17],[20,'UMAR FAROOQ',42647709,1.14],[21,'MUDASSAR CROCKERY STORE',42086783,1.13],
+  [22,'FANCY GLASSWARE /RUSH CROCKERY',41194000,1.10],[23,'Nawaz Crockery',35701459,0.96],[24,'PTC',33797420,0.91],
+  [25,'MUJTABA HOTELWARE',32235283,0.86],[26,'WALI CROCKERY',31829100,0.85],[27,'SULTAN INTERNATIONAL TRADING CO',28079800,0.75],
+  [28,'Umer Jamshaid Enterprises',25718938,0.69],[29,'KAKA BAWA CROCKERY',24290598,0.65],[30,'Rehmatullah Crockery',21314680,0.57],
+  [31,'HME TRADERS',16648262,0.45],[32,'IMRAN BIN DAWOOD CENTER KARACHI',15898357,0.43],[33,'Rainbow Cash & Carry',14394253,0.39],
+  [34,'ATK',12544220,0.34],[35,'TRADE LINE INTERNATIONAL',12242000,0.33],[36,'ABDUL WAHAB CROCKERY',12017807,0.32],
+  [37,'Shaheen Trading Co. Ltd.',11718652,0.31],[38,'HAFIZ ZEESHAN',11630600,0.31],[39,'MANSURI TRADING COMPANY',9298299,0.25],
+  [40,'PUNJAB CASH AND CARRY',8663812,0.23],[41,"ZAIFY'S",8160000,0.22],[42,'SF International KHI',8160000,0.22],
+  [43,'Tariq Glass Industries Limited',7553948,0.20],[44,'Mustaqeem Crockery',7370000,0.20],[45,'RIZWAN INTERNATIONAL',7229268,0.19],
+  [46,'Zeeshan MK Karachi',6355700,0.17],[47,'Zamzama Crockery',6200000,0.17],[48,'Al-Burak International',6109552,0.16],
+  [49,'Usman Imran',4000000,0.11],[50,'MS ZUBAIDA ASSOCIATES',3815000,0.10],[51,'Al-Haram Traders',3703595,0.10],
+  [52,'Ayesha Trading Co.',3155020,0.08],[53,'HAA TRADERS',2923768,0.08],[54,'AS Traders',2706528,0.07],
+  [55,'PIONEER ENTERPRISES',2620000,0.07],[56,'Sheeren Khan',2570000,0.07],[57,'Shar Khan Crockery Store',1489750,0.04],
+  [58,'4 Seasons',1000000,0.03],[59,'Amjad Trader',999600,0.03],[60,'AHMAD ENTERPRISES',547318,0.01],
+  [61,'SHAPE N STYLE',500000,0.01],[62,'Yasir Corporation Karachi',478000,0.01],[63,'TOPAZ',374810,0.01],
+  [64,'Amir Corporation',299880,0.01],[65,'NAEEM HASSAN',102200,0.00]
 ];
- 
-const TODAY = new Date("2026-06-05");
-const USD_EXPOSURE_PKR = 15344104;
-const USD_RATE_BASE = 283.76;
-const USD_EXPOSURE_USD = Math.round(USD_EXPOSURE_PKR / USD_RATE_BASE);
- 
-// ── COMPUTED ─────────────────────────────────────────────────────────────────
-const clients = RAW_DATA.map(d => {
-  const outstanding = d.revenue - d.received;
-  const daysOverdue = Math.max(0, Math.floor((TODAY - new Date(d.due)) / 86400000));
-  const collEff = d.revenue > 0 ? Math.round((d.received / d.revenue) * 100) : 0;
-  const profit = d.revenue - d.cogs;
-  const margin = d.revenue > 0 ? +((profit / d.revenue) * 100).toFixed(1) : 0;
-  const isOverdue = outstanding > 0 && daysOverdue > 0;
-  return {...d, outstanding, daysOverdue, collEff, profit, margin, isOverdue};
+
+const outstandingData = [
+  [1,'Temporary or Seasonal Customer',133693501,90322803,43370698,118.4,'HIGH'],
+  [2,'Munir Ahmed Plastic Dealer',165700119,123656443,40046676,88.2,'MEDIUM'],
+  [3,'MUDASSAR CROCKERY STORE',42086783,12350150,29363014,254.7,'HIGH'],
+  [4,'Pasban Crockery',74000000,53969840,20030160,98.8,'HIGH'],
+  [5,'KAKA BAWA CROCKERY',24290598,5950000,18340597,275.6,'HIGH'],
+  [6,'Gul Age Crockery',44050000,27507754,16542246,137.1,'HIGH'],
+  [7,'USMAN ENTERPRISES',444100972,353941864,16302702,13.4,'LOW'],
+  [8,'SINOPAK BRIDGE (PVT.) LTD',43739001,6786100,10343300,86.3,'MEDIUM'],
+  [9,'Nawaz Crockery',35701459,12694040,7289455,74.5,'MEDIUM'],
+  [10,'RIZWAN INTERNATIONAL',7229268,0,7229268,365,'HIGH'],
+  [11,'SULTAN INTERNATIONAL TRADING CO',28079800,14770000,5000000,65,'MEDIUM'],
+  [12,'MUJTABA HOTELWARE',32235283,24861180,4555343,51.6,'MEDIUM'],
+  [13,'ABDUL WAHAB CROCKERY',12017807,8160347,3857460,117.2,'HIGH'],
+  [14,'Al-Haram Traders',3703595,425000,3278595,323.1,'HIGH'],
+  [15,'PUNJAB CASH AND CARRY',8663812,5700000,2963812,124.9,'HIGH'],
+  [16,'IMRAN VARIETY CENTER',73733792,69828140,2940592,14.6,'LOW'],
+  [17,'HAA TRADERS',2923768,0,2923768,365,'HIGH'],
+  [18,'UMAR FAROOQ',42647709,40673856,1973853,16.9,'LOW'],
+  [19,'Umer Jamshaid Enterprises',25718938,21987682,181256,2.6,'LOW']
+];
+
+const collectionData = [
+  [1,'TRADE LINE INTERNATIONAL',12242000,0,0,'POOR'],
+  [2,'Tariq Glass Industries Limited',7553948,0,0,'POOR'],
+  [3,'RIZWAN INTERNATIONAL',7229268,0,0,'POOR'],
+  [4,'Al-Burak International',6109552,0,0,'POOR'],
+  [5,'Usman Imran',4000000,0,0,'POOR'],
+  [6,'HAA TRADERS',2923768,0,0,'POOR'],
+  [7,'Sheeren Khan',2570000,0,0,'POOR'],
+  [8,'Amjad Trader',999600,0,0,'POOR'],
+  [9,'Al-Haram Traders',3703595,425000,11.5,'POOR'],
+  [10,'SINOPAK BRIDGE (PVT.) LTD',43739001,6786100,15.5,'POOR'],
+  [11,'KAKA BAWA CROCKERY',24290598,5950000,24.5,'POOR'],
+  [12,'MUDASSAR CROCKERY STORE',42086783,12350150,29.3,'POOR'],
+  [13,'Nawaz Crockery',35701459,12694040,35.6,'POOR'],
+  [14,'Zamzama Crockery',6200000,3100000,50.0,'POOR'],
+  [15,'SULTAN INTERNATIONAL TRADING CO',28079800,14770000,52.6,'POOR'],
+  [16,'Gul Age Crockery',44050000,27507754,62.4,'POOR'],
+  [17,'Rehmatullah Crockery',21314680,13533000,63.5,'POOR'],
+  [18,'PUNJAB CASH AND CARRY',8663812,5700000,65.8,'POOR'],
+  [19,'Shar Khan Crockery Store',1489750,989750,66.4,'POOR'],
+  [20,'Temporary or Seasonal Customer',133693501,90322803,67.6,'POOR'],
+  [21,'ABDUL WAHAB CROCKERY',12017807,8160347,67.9,'POOR'],
+  [22,'MANSURI TRADING COMPANY',9298299,6460000,69.5,'POOR'],
+  [23,'ATK',12544220,8721420,69.5,'POOR'],
+  [24,'Rainbow Cash & Carry',14394253,10424963,72.4,'WATCH'],
+  [25,'Pasban Crockery',74000000,53969840,72.9,'WATCH'],
+  [26,'Munir Ahmed Plastic Dealer',165700119,123656443,74.6,'WATCH'],
+  [27,'MUJTABA HOTELWARE',32235283,24861180,77.1,'WATCH'],
+  [28,'JAMEEL AKHTER INTERNATIONAL',255560817,201894867,79.0,'WATCH'],
+  [29,'USMAN ENTERPRISES',444100972,353941864,79.7,'WATCH'],
+  [30,'Mehmood & Brothers',109749919,88214659,80.4,'WATCH'],
+  [31,'Umer Jamshaid Enterprises',25718938,21987682,85.5,'WATCH'],
+  [32,'WAQAR TRADERS',61347560,52978118,86.4,'WATCH'],
+  [33,'GULZAMAN CROCKERY STORE',91954673,79910970,86.9,'WATCH'],
+  [34,"ZAIFY'S",8160000,7291121,89.4,'WATCH'],
+  [35,'FARHAN BROTHER',491117300,439143192,89.4,'WATCH'],
+  [36,'Khawaja Crockery',177800075,159088790,89.5,'WATCH'],
+  [37,'FANCY GLASSWARE /RUSH CROCKERY',41194000,37718952,91.6,'GOOD'],
+  [38,'IMRAN VARIETY CENTER',73733792,69828140,94.7,'GOOD'],
+  [39,'PTC',33797420,32055530,94.8,'GOOD'],
+  [40,'UMAR FAROOQ',42647709,40673856,95.4,'GOOD'],
+  [41,'AB International Trading Compan',117826651,112404021,95.4,'GOOD'],
+  [42,'BARTAN MARKAZ',118251944,114942974,97.2,'GOOD'],
+  [43,'Hassan Paradise',145291903,144040417,99.1,'GOOD'],
+  [44,'Zeeshan MK Karachi',6355700,6355700,100,'GOOD'],
+  [45,'PIONEER ENTERPRISES',2620000,2620000,100,'GOOD'],
+  [46,'SHAPE N STYLE',500000,500000,100,'GOOD'],
+  [47,'Yasir Corporation Karachi',478000,478000,100,'GOOD'],
+  [48,'TOPAZ',374810,374810,100,'GOOD'],
+  [49,'NAEEM HASSAN',102200,102200,100,'GOOD'],
+  [50,'Amir Corporation',299880,300000,100,'GOOD'],
+  [51,'Mustaqeem Crockery',7370000,7383089,100.2,'GOOD'],
+  [52,'CKT CROCKERY',158624928,162906348,102.7,'GOOD'],
+  [53,'MS ZUBAIDA ASSOCIATES',3815000,4010080,105.1,'GOOD'],
+  [54,'POS Retail Shops',401900213,431383836,107.3,'GOOD'],
+  [55,'Ayesha Trading Co.',3155020,3552000,112.6,'GOOD'],
+  [56,'WALI CROCKERY',31829100,36170000,113.6,'GOOD'],
+  [57,'IMRAN BIN DAWOOD CENTER KARACHI',15898357,19659357,123.7,'GOOD'],
+  [58,'AHMAD ENTERPRISES',547318,700000,127.9,'GOOD'],
+  [59,'4 Seasons',1000000,1500000,150,'GOOD'],
+  [60,'HAFIZ ZEESHAN',11630600,18285766,157.2,'GOOD'],
+  [61,'AS Traders',2706528,4368824,161.4,'GOOD'],
+  [62,'SF International KHI',8160000,14980500,183.6,'GOOD'],
+  [63,'HYK Traders',52741465,107542907,203.9,'GOOD'],
+  [64,'Shaheen Trading Co. Ltd.',11718652,24995565,213.3,'GOOD'],
+  [65,'HME TRADERS',16648262,38002400,228.3,'GOOD']
+];
+
+const overdueData = [
+  {name:'RIZWAN INTERNATIONAL',rev:7229268,ar:7229268,dso:365,eff:0,level:'HIGH'},
+  {name:'HAA TRADERS',rev:2923768,ar:2923768,dso:365,eff:0,level:'HIGH'},
+  {name:'Al-Haram Traders',rev:3703595,ar:3278595,dso:323.1,eff:11.5,level:'HIGH'},
+  {name:'KAKA BAWA CROCKERY',rev:24290598,ar:18340597,dso:275.6,eff:24.5,level:'HIGH'},
+  {name:'MUDASSAR CROCKERY STORE',rev:42086783,ar:29363014,dso:254.7,eff:29.3,level:'HIGH'},
+  {name:'Gul Age Crockery',rev:44050000,ar:16542246,dso:137.1,eff:62.4,level:'HIGH'},
+  {name:'PUNJAB CASH AND CARRY',rev:8663812,ar:2963812,dso:124.9,eff:65.8,level:'HIGH'},
+  {name:'Temporary or Seasonal Customer',rev:133693501,ar:43370698,dso:118.4,eff:67.6,level:'HIGH'},
+  {name:'ABDUL WAHAB CROCKERY',rev:12017807,ar:3857460,dso:117.2,eff:67.9,level:'HIGH'},
+  {name:'Pasban Crockery',rev:74000000,ar:20030160,dso:98.8,eff:72.9,level:'HIGH'},
+  {name:'Munir Ahmed Plastic Dealer',rev:165700119,ar:40046676,dso:88.2,eff:74.6,level:'MEDIUM'},
+  {name:'SINOPAK BRIDGE (PVT.) LTD',rev:43739001,ar:10343300,dso:86.3,eff:15.5,level:'MEDIUM'},
+  {name:'Nawaz Crockery',rev:35701459,ar:7289455,dso:74.5,eff:35.6,level:'MEDIUM'},
+  {name:'SULTAN INTERNATIONAL TRADING CO',rev:28079800,ar:5000000,dso:65,eff:52.6,level:'MEDIUM'},
+  {name:'MUJTABA HOTELWARE',rev:32235283,ar:4555343,dso:51.6,eff:77.1,level:'MEDIUM'},
+  {name:'UMAR FAROOQ',rev:42647709,ar:1973853,dso:16.9,eff:95.4,level:'LOW'},
+  {name:'IMRAN VARIETY CENTER',rev:73733792,ar:2940592,dso:14.6,eff:94.7,level:'LOW'},
+  {name:'USMAN ENTERPRISES',rev:444100972,ar:16302702,dso:13.4,eff:79.7,level:'LOW'},
+  {name:'Umer Jamshaid Enterprises',rev:25718938,ar:181256,dso:2.6,eff:85.5,level:'LOW'}
+];
+
+const marginData = revRanked.map(r => ({
+  rank:r[0], name:r[1], rev:r[2],
+  cogs: r[2]*0.9001, gp: r[2]*0.0999, gm:9.99
+}));
+
+const top10 = [
+  {rank:1,name:'FARHAN BROTHER',rev:491117300,pct:13.15,ar:0,eff:89.4},
+  {rank:2,name:'USMAN ENTERPRISES',rev:444100972,pct:11.89,ar:16302702,eff:79.7},
+  {rank:3,name:'POS Retail Shops',rev:401900213,pct:10.76,ar:0,eff:107.3},
+  {rank:4,name:'JAMEEL AKHTER INTERNATIONAL',rev:255560817,pct:6.84,ar:0,eff:79.0},
+  {rank:5,name:'Khawaja Crockery',rev:177800075,pct:4.76,ar:0,eff:89.5},
+  {rank:6,name:'Munir Ahmed Plastic Dealer',rev:165700119,pct:4.44,ar:40046676,eff:74.6},
+  {rank:7,name:'CKT CROCKERY',rev:158624928,pct:4.25,ar:0,eff:102.7},
+  {rank:8,name:'Hassan Paradise',rev:145291903,pct:3.89,ar:0,eff:99.1},
+  {rank:9,name:'Temporary or Seasonal Customer',rev:133693501,pct:3.58,ar:43370698,eff:67.6},
+  {rank:10,name:'BARTAN MARKAZ',rev:118251944,pct:3.17,ar:0,eff:97.2}
+];
+const bot10 = [
+  {rank:1,name:'NAEEM HASSAN',rev:102200,pct:0.00,ar:0,eff:100},
+  {rank:2,name:'Amir Corporation',rev:299880,pct:0.01,ar:0,eff:100},
+  {rank:3,name:'TOPAZ',rev:374810,pct:0.01,ar:0,eff:100},
+  {rank:4,name:'Yasir Corporation Karachi',rev:478000,pct:0.01,ar:0,eff:100},
+  {rank:5,name:'SHAPE N STYLE',rev:500000,pct:0.01,ar:0,eff:100},
+  {rank:6,name:'AHMAD ENTERPRISES',rev:547318,pct:0.01,ar:0,eff:127.9},
+  {rank:7,name:'Amjad Trader',rev:999600,pct:0.03,ar:0,eff:0},
+  {rank:8,name:'4 Seasons',rev:1000000,pct:0.03,ar:0,eff:150},
+  {rank:9,name:'Shar Khan Crockery Store',rev:1489750,pct:0.04,ar:0,eff:66.4},
+  {rank:10,name:'Sheeren Khan',rev:2570000,pct:0.07,ar:0,eff:0}
+];
+
+// ══════════════════════════════════════════════════
+// CHART SETUP
+// ══════════════════════════════════════════════════
+const COLORS = {
+  blue:'#3b7cff',green:'#22c55e',red:'#ef4444',
+  amber:'#f59e0b',cyan:'#06b6d4',purple:'#a855f7',
+  grid:'rgba(255,255,255,.06)',text:'#8b97b4'
+};
+Chart.defaults.color = COLORS.text;
+Chart.defaults.font.family = "'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size = 11;
+
+const base = {
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{boxWidth:10,padding:12,color:COLORS.text}}},
+  scales:{
+    x:{grid:{color:COLORS.grid},ticks:{color:COLORS.text}},
+    y:{grid:{color:COLORS.grid},ticks:{color:COLORS.text}}
+  }
+};
+
+function fc(id,cfg){const e=document.getElementById(id);if(!e)return null;return new Chart(e,cfg);}
+
+// Overview P&L
+fc('c-overview-pl',{type:'bar',data:{labels:['FY2023','FY2024','FY2025'],datasets:[
+  {label:'Revenue',data:[2310,2640,2967],backgroundColor:'rgba(59,124,255,.7)',borderRadius:5},
+  {label:'Gross Profit',data:[380,412,445],backgroundColor:'rgba(34,197,94,.7)',borderRadius:5},
+  {label:'Net Profit',data:[54,60,58],backgroundColor:'rgba(6,182,212,.7)',borderRadius:5},
+]},options:{...base,scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{callback:v=>`${v}M`}}}}});
+
+// Overview top 5 clients
+fc('c-overview-clients',{type:'bar',data:{
+  labels:['FARHAN BROTHER','USMAN ENT.','POS Retail','JAMEEL AKHTER','Khawaja Crockery'],
+  datasets:[{label:'Revenue',data:[491,444,402,256,178],backgroundColor:'rgba(59,124,255,.7)',borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y}}}});
+
+// P&L
+fc('c-pl-bar',{type:'bar',data:{labels:['Revenue','COGS','Gross P.','OpEx','EBIT','Finance','Net P.'],datasets:[{
+  data:[2967,-2522,445,-354,91,-24,58],
+  backgroundColor:ctx=>ctx.raw<0?'rgba(239,68,68,.6)':'rgba(34,197,94,.6)',
+  borderColor:ctx=>ctx.raw<0?COLORS.red:COLORS.green,borderWidth:1,borderRadius:5
+}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{callback:v=>Math.abs(v)>=1000?`${(v/1000).toFixed(1)}B`:`${v}M`}}}}});
+
+fc('c-pl-margins',{type:'line',data:{labels:['FY2023','FY2024','FY2025'],datasets:[
+  {label:'Gross Margin %',data:[16.4,15.6,15.0],borderColor:COLORS.green,backgroundColor:'rgba(34,197,94,.06)',tension:.4,fill:true,pointRadius:4},
+  {label:'Net Margin %',data:[2.34,2.27,1.95],borderColor:COLORS.amber,backgroundColor:'rgba(245,158,11,.06)',tension:.4,fill:true,pointRadius:4},
+]},options:{...base,scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{callback:v=>`${v}%`}}}}});
+
+// Stock
+fc('c-stock-pie',{type:'doughnut',data:{
+  labels:['Raw Material','WIP','Finished Goods','Stores & Spares'],
+  datasets:[{data:[2840,620,3400,433],backgroundColor:[COLORS.amber,COLORS.cyan,COLORS.blue,COLORS.red],borderWidth:0}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,color:COLORS.text}}}}});
+
+fc('c-stock-yoy',{type:'bar',data:{labels:['Raw Material','WIP','Finished Goods','Stores & Spares'],datasets:[
+  {label:'FY2024',data:[2749,620,3234,390],backgroundColor:'rgba(59,124,255,.4)',borderRadius:4},
+  {label:'FY2025',data:[2840,620,3400,433],backgroundColor:'rgba(59,124,255,.8)',borderRadius:4},
+]},options:{...base,scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{callback:v=>`${v}M`}}}}});
+
+// Payables
+fc('c-pay-pie',{type:'doughnut',data:{
+  labels:['Local Creditors','Contract Liab.','Foreign Creditors','Accrued Exp.','WPPF/WWF'],
+  datasets:[{data:[840,320,280,186,19],backgroundColor:[COLORS.red,COLORS.amber,COLORS.blue,COLORS.cyan,COLORS.green],borderWidth:0}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,color:COLORS.text}}}}});
+
+fc('c-pay-aging',{type:'bar',data:{labels:['0–30 days','31–60 days','61–90 days','90+ days'],datasets:[{
+  label:'Payables',data:[620,460,320,245],
+  backgroundColor:[COLORS.green,'rgba(245,158,11,.7)','rgba(239,68,68,.6)',COLORS.red],borderRadius:5
+}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{callback:v=>`${v}M`}}}}});
+
+// Tax
+fc('c-tax-pie',{type:'doughnut',data:{
+  labels:['Adv. Income Tax','Advances to Supp.','Sales Tax Recv.','Prepaid'],
+  datasets:[{data:[198,184,142,56],backgroundColor:[COLORS.amber,COLORS.cyan,COLORS.blue,COLORS.green],borderWidth:0}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,color:COLORS.text}}}}});
+
+// Borrowings
+fc('c-bor-pie',{type:'doughnut',data:{
+  labels:['Mr. Zhang Qi','Mr. Tu Chuanfu','Time Ceramics (Pvt) Ltd'],
+  datasets:[{data:[960,870,600],backgroundColor:[COLORS.red,COLORS.amber,COLORS.blue],borderWidth:0}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,color:COLORS.text}}}}});
+
+// PPE
+fc('c-ppe-bar',{type:'bar',data:{labels:['Buildings','Plant & Mach.','Furniture','Vehicles','Office Equip.'],datasets:[
+  {label:'Gross Value',data:[310,380,48,78,25],backgroundColor:'rgba(59,124,255,.5)',borderRadius:4},
+  {label:'Net Book Value',data:[168,150,14,56,10],backgroundColor:COLORS.cyan,borderRadius:4},
+]},options:{...base,scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{callback:v=>`${v}M`}}}}});
+
+// Banks
+fc('c-banks',{type:'bar',data:{
+  labels:['Soneri','Meezan','HBL','MCB','Habib Metro','Alfalah'],
+  datasets:[{data:[1.2,-2296.1,69.6,-61.8,-8.6,-370.2],
+    backgroundColor:['rgba(34,197,94,.7)','rgba(239,68,68,.7)','rgba(34,197,94,.7)','rgba(239,68,68,.7)','rgba(239,68,68,.7)','rgba(239,68,68,.7)'],
+    borderColor:['#22c55e','#ef4444','#22c55e','#ef4444','#ef4444','#ef4444'],borderWidth:1,borderRadius:5
+  }]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y}}}});
+
+// Ratios
+fc('c-ratio-trend',{type:'line',data:{labels:['FY2023','FY2024','FY2025'],datasets:[
+  {label:'Current Ratio',data:[1.08,1.06,1.04],borderColor:COLORS.cyan,tension:.4,yAxisID:'y',pointRadius:4},
+  {label:'Quick Ratio',data:[0.18,0.16,0.14],borderColor:COLORS.amber,tension:.4,yAxisID:'y',pointRadius:4},
+  {label:'D/E Ratio',data:[2.1,2.3,2.47],borderColor:COLORS.red,tension:.4,yAxisID:'y2',pointRadius:4},
+]},options:{...base,scales:{
+  x:{...base.scales.x},
+  y:{...base.scales.y,position:'left',title:{display:true,text:'Liquidity',color:COLORS.text}},
+  y2:{grid:{display:false},position:'right',ticks:{color:COLORS.text},title:{display:true,text:'D/E',color:COLORS.text}}
+}}});
+
+// YoY
+fc('c-yoy-trend',{type:'line',data:{labels:['FY2023','FY2024','FY2025'],datasets:[
+  {label:'Revenue (M)',data:[2310,2640,2967],borderColor:COLORS.blue,backgroundColor:'rgba(59,124,255,.06)',tension:.4,fill:true,yAxisID:'y',pointRadius:4},
+  {label:'Gross Profit (M)',data:[380,412,445],borderColor:COLORS.green,tension:.4,yAxisID:'y',pointRadius:4},
+  {label:'Net Profit (M)',data:[54,60,58],borderColor:COLORS.amber,tension:.4,yAxisID:'y2',pointRadius:4},
+]},options:{...base,scales:{
+  x:{...base.scales.x},
+  y:{...base.scales.y,position:'left',ticks:{callback:v=>`${v}M`}},
+  y2:{grid:{display:false},position:'right',ticks:{callback:v=>`${v}M`,color:COLORS.text}}
+}}});
+
+// Rev ranked top10
+const top10Names = revRanked.slice(0,10).map(r=>r[1].length>18?r[1].substring(0,18)+'…':r[1]);
+const top10Vals = revRanked.slice(0,10).map(r=>Math.round(r[2]/1000000));
+fc('c-rev-top10',{type:'bar',data:{
+  labels:top10Names,
+  datasets:[{label:'Revenue (M)',data:top10Vals,backgroundColor:'rgba(59,124,255,.7)',borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// Revenue concentration
+const top10Rev = revRanked.slice(0,10).reduce((a,r)=>a+r[2],0);
+const totalRev = 3733560802;
+fc('c-rev-conc',{type:'doughnut',data:{
+  labels:['Top 10 Clients','Next 10','Remaining 45'],
+  datasets:[{data:[Math.round(top10Rev/1e6), Math.round(revRanked.slice(10,20).reduce((a,r)=>a+r[2],0)/1e6), Math.round(revRanked.slice(20).reduce((a,r)=>a+r[2],0)/1e6)],
+    backgroundColor:[COLORS.blue,COLORS.cyan,'rgba(59,124,255,.25)'],borderWidth:0}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,color:COLORS.text}}}}});
+
+// Outstanding bar
+const outTop10 = outstandingData.filter(r=>r[6]!='LOW').slice(0,10);
+fc('c-outstanding-bar',{type:'bar',data:{
+  labels:outTop10.map(r=>r[1].length>16?r[1].substring(0,16)+'…':r[1]),
+  datasets:[{label:'Outstanding AR (M)',data:outTop10.map(r=>+(r[4]/1e6).toFixed(1)),
+    backgroundColor:outTop10.map(r=>r[6]==='HIGH'?'rgba(239,68,68,.7)':'rgba(245,158,11,.7)'),borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// DSO bar
+fc('c-dso-bar',{type:'bar',data:{
+  labels:outstandingData.filter(r=>r[4]>0).slice(0,10).map(r=>r[1].length>14?r[1].substring(0,14)+'…':r[1]),
+  datasets:[{label:'DSO (Days)',data:outstandingData.filter(r=>r[4]>0).slice(0,10).map(r=>r[5]),
+    backgroundColor:outstandingData.filter(r=>r[4]>0).slice(0,10).map(r=>r[5]>90?'rgba(239,68,68,.7)':r[5]>45?'rgba(245,158,11,.7)':'rgba(34,197,94,.7)'),borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// Collection pie
+fc('c-coll-pie',{type:'doughnut',data:{
+  labels:['POOR (<70%)','WATCH (70-90%)','GOOD (90%+)'],
+  datasets:[{data:[23,13,29],backgroundColor:[COLORS.red,COLORS.amber,COLORS.green],borderWidth:0}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,color:COLORS.text}}}}});
+
+// Worst 10 efficiency
+const worst10 = collectionData.filter(r=>r[4]<100 && r[3]>=0).slice(0,10);
+fc('c-coll-worst',{type:'bar',data:{
+  labels:worst10.map(r=>r[1].length>14?r[1].substring(0,14)+'…':r[1]),
+  datasets:[{label:'Efficiency %',data:worst10.map(r=>r[4]),
+    backgroundColor:worst10.map(r=>r[4]<70?'rgba(239,68,68,.7)':'rgba(245,158,11,.7)'),borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,min:0,max:100,ticks:{callback:v=>`${v}%`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// Overdue chart (bubble-style bar)
+const overdueHigh = overdueData.filter(d=>d.level==='HIGH');
+fc('c-overdue-chart',{type:'bar',data:{
+  labels:overdueData.map(d=>d.name.length>18?d.name.substring(0,18)+'…':d.name),
+  datasets:[
+    {label:'Outstanding AR (M)',data:overdueData.map(d=>+(d.ar/1e6).toFixed(1)),
+      backgroundColor:overdueData.map(d=>d.level==='HIGH'?'rgba(239,68,68,.7)':d.level==='MEDIUM'?'rgba(245,158,11,.7)':'rgba(34,197,94,.7)'),borderRadius:5}
+  ]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// Margin bar
+fc('c-margin-bar',{type:'bar',data:{
+  labels:marginData.slice(0,10).map(r=>r.name.length>14?r.name.substring(0,14)+'…':r.name),
+  datasets:[{label:'Est. Gross Profit (M)',data:marginData.slice(0,10).map(r=>+(r.gp/1e6).toFixed(1)),
+    backgroundColor:'rgba(34,197,94,.7)',borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// Margin compare
+fc('c-margin-compare',{type:'bar',data:{
+  labels:marginData.slice(0,10).map(r=>r.name.length>10?r.name.substring(0,10)+'…':r.name),
+  datasets:[
+    {label:'Revenue',data:marginData.slice(0,10).map(r=>+(r.rev/1e6).toFixed(1)),backgroundColor:'rgba(59,124,255,.5)',borderRadius:4},
+    {label:'Est. GP',data:marginData.slice(0,10).map(r=>+(r.gp/1e6).toFixed(1)),backgroundColor:'rgba(34,197,94,.7)',borderRadius:4}
+  ]
+},options:{...base,scales:{x:{...base.scales.x,ticks:{font:{size:9}}},y:{...base.scales.y,ticks:{callback:v=>`${v}M`}}}}});
+
+// Top/Bot 10 charts
+fc('c-top10-bar',{type:'bar',data:{
+  labels:top10.map(r=>r.name.length>14?r.name.substring(0,14)+'…':r.name),
+  datasets:[{label:'Revenue (M)',data:top10.map(r=>+(r.rev/1e6).toFixed(1)),backgroundColor:'rgba(59,124,255,.7)',borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}M`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+fc('c-bot10-bar',{type:'bar',data:{
+  labels:bot10.map(r=>r.name.length>14?r.name.substring(0,14)+'…':r.name),
+  datasets:[{label:'Revenue',data:bot10.map(r=>+(r.rev/1e6*1000).toFixed(0)),backgroundColor:'rgba(245,158,11,.7)',borderRadius:5}]
+},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{callback:v=>`${v}K`}},y:{...base.scales.y,ticks:{font:{size:9}}}}}});
+
+// ══════════════════════════════════════════════════
+// BREAKDOWN ROWS
+// ══════════════════════════════════════════════════
+function renderBk(id,items){
+  const c=document.getElementById(id);if(!c)return;
+  const max=Math.max(...items.map(i=>Math.abs(i.v)));
+  c.innerHTML=items.map(i=>`<div class="bk-row">
+    <span class="bk-name">${i.n}</span>
+    <div class="bk-bar-wrap"><div class="bk-bar ${i.c}" style="width:${Math.round(Math.abs(i.v)/max*100)}%"></div></div>
+    <span class="bk-val">Rs. ${i.v.toLocaleString()}M</span>
+    <span class="bk-pct">${(i.v/max*100).toFixed(0)}%</span>
+  </div>`).join('');
+}
+renderBk('stock-bk',[{n:'Raw Material',v:2840,c:'amber'},{n:'Work in Process',v:620,c:'cyan'},{n:'Finished Goods',v:3400,c:'blue'},{n:'Stores & Spares',v:433,c:'red'}]);
+renderBk('payables-bk',[{n:'Local Creditors',v:840,c:'red'},{n:'Contract Liabilities',v:320,c:'amber'},{n:'Foreign Creditors',v:280,c:'blue'},{n:'Accrued Expenses',v:186,c:'cyan'},{n:'WPPF+WWF',v:19,c:'green'}]);
+renderBk('tax-bk',[{n:'Advance Income Tax',v:198,c:'amber'},{n:'Advances to Suppliers',v:184,c:'cyan'},{n:'Sales Tax Receivable',v:142,c:'blue'},{n:'Prepaid Expenses',v:56,c:'green'}]);
+renderBk('borrowings-bk',[{n:'Mr. Zhang Qi',v:960,c:'red'},{n:'Mr. Tu Chuanfu',v:870,c:'amber'},{n:'Time Ceramics (Pvt) Ltd',v:600,c:'blue'}]);
+renderBk('ppe-bk',[{n:'PP&E (Net)',v:398,c:'blue'},{n:'LT Security Deposits',v:22,c:'cyan'}]);
+
+// ══════════════════════════════════════════════════
+// TABLE RENDERERS
+// ══════════════════════════════════════════════════
+function fmt(n){return Math.abs(n)>=1e6?(n/1e6).toFixed(1)+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(0)+'K':n.toLocaleString();}
+function fmtPKR(n){return 'Rs.'+Math.round(n).toLocaleString();}
+
+// Revenue ranked table
+const revTbody = document.getElementById('rev-tbody');
+revRanked.forEach(r=>{
+  const cumPct = r[4]? (revRanked.slice(0,r[0]).reduce((a,x)=>a+x[2],0)/totalRev*100).toFixed(1) : r[3].toFixed(2);
+  revTbody.innerHTML += `<tr>
+    <td>${r[0]}</td><td>${r[1]}</td>
+    <td class="num">${fmtPKR(r[2])}</td>
+    <td class="num">${r[3].toFixed(2)}%</td>
+    <td class="num">${(revRanked.slice(0,r[0]).reduce((a,x)=>a+x[3],0)).toFixed(1)}%</td>
+  </tr>`;
 });
- 
-const totalRevenue = clients.reduce((s,c)=>s+c.revenue,0);
-const totalReceived = clients.reduce((s,c)=>s+c.received,0);
-const totalOutstanding = clients.reduce((s,c)=>s+c.outstanding,0);
-const totalProfit = clients.reduce((s,c)=>s+c.profit,0);
-const overallMargin = +((totalProfit/totalRevenue)*100).toFixed(1);
-const collEff = +((totalReceived/totalRevenue)*100).toFixed(1);
-const overdueClients = clients.filter(c=>c.isOverdue);
-const overdueAmount = overdueClients.reduce((s,c)=>s+c.outstanding,0);
- 
-// Cash flow: 30/60/90 day buckets
-function cashIn(days) {
-  return clients.filter(c => {
-    const due = new Date(c.due);
-    const diff = Math.floor((due - TODAY) / 86400000);
-    return diff <= days && diff >= 0 && c.outstanding > 0;
-  }).reduce((s,c)=>s+c.outstanding,0);
-}
-const cf30 = cashIn(30);
-const cf60 = cashIn(60);
-const cf90 = cashIn(90);
- 
-// Working capital score
-function calcWCScore() {
-  let score = 0;
-  // Collection efficiency (30 pts)
-  score += Math.min(30, collEff * 0.3);
-  // Overdue ratio (25 pts)
-  const overdueRatio = overdueAmount / totalOutstanding;
-  score += Math.max(0, 25 - overdueRatio * 25);
-  // Margin (20 pts)
-  score += Math.min(20, overallMargin * 0.5);
-  // Cash coverage 30-day (25 pts)
-  const coverage = totalRevenue > 0 ? cf30 / totalRevenue : 0;
-  score += Math.min(25, coverage * 50);
-  return Math.round(score);
-}
-const wcScore = calcWCScore();
- 
-// ── FORMAT ────────────────────────────────────────────────────────────────────
-const fmt = n => n >= 1e6
-  ? (n/1e6).toFixed(2) + 'M'
-  : n >= 1e3 ? (n/1e3).toFixed(0) + 'K' : n.toString();
-const fmtPKR = n => '₨ ' + n.toLocaleString('en-PK');
- 
-function statusBadge(status) {
-  if(status==='Paid') return `<span class="kpi-badge badge-green">Paid</span>`;
-  if(status==='Partial') return `<span class="kpi-badge badge-amber">Partial</span>`;
-  return `<span class="kpi-badge badge-red">Unpaid</span>`;
-}
- 
-function overdueSeverity(days) {
-  if(days > 90) return 'critical';
-  if(days > 30) return 'warn';
-  return '';
-}
- 
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function renderKPIs() {
-  const el = document.getElementById('kpiGrid');
-  const kpis = [
-    {label:'Total Revenue',val:'₨ '+fmt(totalRevenue),sub:'All invoices',cls:'c-cyan',badge:null},
-    {label:'Total Received',val:'₨ '+fmt(totalReceived),sub:`${collEff}% collected`,cls:'c-green',badge:{text:collEff+'%',cls:'badge-green'}},
-    {label:'Outstanding',val:'₨ '+fmt(totalOutstanding),sub:`${clients.filter(c=>c.outstanding>0).length} clients`,cls:'c-amber',badge:null},
-    {label:'Overdue Amount',val:'₨ '+fmt(overdueAmount),sub:`${overdueClients.length} clients overdue`,cls:'c-red',badge:{text:overdueClients.length+' OVERDUE',cls:'badge-red'}},
-    {label:'Avg Margin',val:overallMargin+'%',sub:'Gross profit margin',cls:'c-purple',badge:null},
-    {label:'WC Score',val:wcScore+'/100',sub:'Working capital health',cls:'c-cyan',badge:{text:wcScore>=70?'HEALTHY':wcScore>=40?'WARNING':'CRITICAL',cls:wcScore>=70?'badge-green':wcScore>=40?'badge-amber':'badge-red'}},
-  ];
-  el.innerHTML = kpis.map(k=>`
-    <div class="kpi ${k.cls}">
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-val">${k.val}</div>
-      <div class="kpi-sub">${k.sub}</div>
-      ${k.badge ? `<div><span class="kpi-badge ${k.badge.cls}">${k.badge.text}</span></div>` : ''}
-    </div>`).join('');
-}
- 
-function renderRevenueRanked() {
-  const sorted = [...clients].sort((a,b)=>b.revenue-a.revenue);
-  const t = document.getElementById('revenueRanked');
-  t.innerHTML = `<thead><tr>
-    <th>#</th><th>Client</th><th>Revenue</th><th>Received</th><th>Outstanding</th><th>Margin</th><th>Status</th>
-  </tr></thead><tbody>` +
-  sorted.map((c,i)=>`<tr>
-    <td><span class="rank-num ${i<3?'top3':''}">${i+1}</span></td>
-    <td style="font-weight:500;max-width:160px">${c.name}</td>
-    <td class="mono" style="color:var(--cyan)">₨${fmt(c.revenue)}</td>
-    <td class="mono" style="color:var(--green)">₨${fmt(c.received)}</td>
-    <td class="mono" style="color:${c.outstanding>0?'var(--amber)':'var(--muted)'}">₨${fmt(c.outstanding)}</td>
-    <td class="mono" style="color:${c.margin>30?'var(--green)':c.margin>15?'var(--amber)':'var(--red)'}">${c.margin}%</td>
-    <td>${statusBadge(c.status)}</td>
-  </tr>`).join('') + '</tbody>';
-}
- 
-function renderWCScore() {
-  const el = document.getElementById('wcScore');
-  const color = wcScore >= 70 ? 'var(--green)' : wcScore >= 40 ? 'var(--amber)' : 'var(--red)';
-  const label = wcScore >= 70 ? '✅ Healthy' : wcScore >= 40 ? '⚠️ Warning' : '🔴 Critical';
-  const desc = wcScore >= 70 ? 'Cash position is strong' : wcScore >= 40 ? 'Needs attention soon' : 'Immediate action needed';
-  const pct = wcScore / 100;
-  const circ = 2 * Math.PI * 50;
-  el.innerHTML = `
-    <div class="score-ring">
-      <svg width="130" height="130" viewBox="0 0 130 130">
-        <circle cx="65" cy="65" r="50" fill="none" stroke="var(--bg3)" stroke-width="10"/>
-        <circle cx="65" cy="65" r="50" fill="none" stroke="${color}" stroke-width="10"
-          stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}"
-          stroke-linecap="round" style="transition:stroke-dashoffset 1s ease"/>
-      </svg>
-      <div class="score-center">
-        <div class="score-num" style="color:${color}">${wcScore}</div>
-        <div class="score-label">/100</div>
+
+// Outstanding table
+const outTbody = document.getElementById('out-tbody');
+outstandingData.forEach((r,i)=>{
+  const riskCls = r[6]==='HIGH'?'high':r[6]==='MEDIUM'?'medium':'low';
+  outTbody.innerHTML += `<tr>
+    <td>${i+1}</td><td>${r[1]}</td>
+    <td class="num">${fmtPKR(r[2])}</td>
+    <td class="num">${fmtPKR(r[3])}</td>
+    <td class="num">${r[4]>0?fmtPKR(r[4]):'—'}</td>
+    <td class="num">${r[5]>0?r[5]+' d':'—'}</td>
+    <td><span class="pill ${riskCls}">${r[6]}</span></td>
+  </tr>`;
+});
+
+// Collection table
+const collTbody = document.getElementById('coll-tbody');
+collectionData.forEach(r=>{
+  const stCls = r[5]==='POOR'?'poor':r[5]==='WATCH'?'watch':'good';
+  collTbody.innerHTML += `<tr>
+    <td>${r[0]}</td><td>${r[1]}</td>
+    <td class="num">${fmtPKR(r[2])}</td>
+    <td class="num">${fmtPKR(r[3])}</td>
+    <td class="num">${r[4].toFixed(1)}%</td>
+    <td><span class="pill ${stCls}">${r[5]}</span></td>
+  </tr>`;
+});
+
+// Margin table
+const marginTbody = document.getElementById('margin-tbody');
+marginData.forEach(r=>{
+  marginTbody.innerHTML += `<tr>
+    <td>${r.rank}</td><td>${r.name}</td>
+    <td class="num">${fmtPKR(r.rev)}</td>
+    <td class="num">${fmtPKR(r.cogs)}</td>
+    <td class="num">${fmtPKR(r.gp)}</td>
+    <td class="num">9.99%</td>
+  </tr>`;
+});
+
+// Top10 / Bottom10 tables
+const top10Tbody = document.getElementById('top10-tbody');
+top10.forEach(r=>{
+  top10Tbody.innerHTML += `<tr>
+    <td>${r.rank}</td><td>${r.name}</td>
+    <td class="num">${fmtPKR(r.rev)}</td>
+    <td class="num">${r.ar>0?fmtPKR(r.ar):'—'}</td>
+    <td class="num">${r.eff.toFixed(1)}%</td>
+  </tr>`;
+});
+const bot10Tbody = document.getElementById('bot10-tbody');
+bot10.forEach(r=>{
+  bot10Tbody.innerHTML += `<tr>
+    <td>${r.rank}</td><td>${r.name}</td>
+    <td class="num">${fmtPKR(r.rev)}</td>
+    <td class="num">${r.ar>0?fmtPKR(r.ar):'—'}</td>
+    <td class="num">${r.eff>0?r.eff.toFixed(1)+'%':'—'}</td>
+  </tr>`;
+});
+
+// Overdue alert cards
+function buildAlertCards(containerId, data){
+  const c = document.getElementById(containerId);
+  if(!c)return;
+  data.forEach(d=>{
+    const lvl = d.level.toLowerCase()+'-a';
+    const effColor = d.eff<50?'var(--red)':d.eff<80?'var(--amber)':'var(--green)';
+    c.innerHTML += `<div class="alert-card ${d.level.toLowerCase()}">
+      <div class="alert-name">${d.name}</div>
+      <div class="alert-meta">
+        <div class="alert-item">AR: <span>Rs.${fmt(d.ar)}</span></div>
+        <div class="alert-item">DSO: <span>${d.dso} days</span></div>
+        <div class="alert-item">Eff: <span style="color:${effColor}">${d.eff.toFixed(0)}%</span></div>
       </div>
-    </div>
-    <div class="score-status" style="color:${color}">${label}</div>
-    <div class="score-desc">${desc}</div>`;
- 
-  document.getElementById('wcBreakdown').innerHTML = `
-    <div style="margin-top:16px">
-      ${[
-        {l:'Collection Rate',v:Math.round(Math.min(30,collEff*0.3)),max:30,unit:'pts'},
-        {l:'Overdue Ratio',v:Math.round(Math.max(0,25-(overdueAmount/totalOutstanding)*25)),max:25,unit:'pts'},
-        {l:'Profit Margin',v:Math.round(Math.min(20,overallMargin*0.5)),max:20,unit:'pts'},
-        {l:'30-Day Coverage',v:Math.round(Math.min(25,(cf30/totalRevenue)*50)),max:25,unit:'pts'},
-      ].map(f=>`<div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-          <span style="color:var(--muted)">${f.l}</span>
-          <span style="font-weight:600">${f.v}/${f.max}</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-bar" style="width:${(f.v/f.max)*100}%;background:linear-gradient(90deg,var(--cyan),var(--blue))"></div></div>
-      </div>`).join('')}
+      <div class="prog-wrap"><div class="prog-bar" style="width:${Math.min(d.eff,100)}%;background:${effColor}"></div></div>
     </div>`;
+  });
 }
- 
-function renderCollEff() {
-  const sorted = [...clients].sort((a,b)=>b.collEff-a.collEff);
-  document.getElementById('collEffCard').innerHTML = sorted.map(c=>`
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
-        <span style="font-weight:500">${c.name}</span>
-        <span style="font-family:'DM Mono',monospace;font-weight:600;color:${c.collEff>=80?'var(--green)':c.collEff>=40?'var(--amber)':'var(--red)'}">${c.collEff}%</span>
-      </div>
-      <div class="prog-wrap"><div class="prog-bar" style="width:${c.collEff}%;background:${c.collEff>=80?'var(--green)':c.collEff>=40?'var(--amber)':'var(--red)'}"></div></div>
-    </div>`).join('');
+buildAlertCards('high-alerts', overdueData.filter(d=>d.level==='HIGH'));
+buildAlertCards('medium-alerts', overdueData.filter(d=>d.level==='MEDIUM'));
+buildAlertCards('low-alerts', overdueData.filter(d=>d.level==='LOW'));
+
+// ══════════════════════════════════════════════════
+// TABLE SEARCH FILTER
+// ══════════════════════════════════════════════════
+function filterTable(tableId, query, col){
+  const tbl = document.getElementById(tableId);
+  if(!tbl)return;
+  const rows = tbl.querySelectorAll('tbody tr');
+  const q = query.toLowerCase();
+  rows.forEach(r=>{
+    const cells = r.querySelectorAll('td');
+    const match = !q || (cells[col] && cells[col].textContent.toLowerCase().includes(q));
+    r.style.display = match?'':'none';
+  });
 }
- 
-function renderTop10Bottom10() {
-  const sorted = [...clients].sort((a,b)=>b.revenue-a.revenue);
-  const top10 = sorted.slice(0,10);
-  const bot10 = [...sorted].reverse().slice(0,10);
-  const maxRev = top10[0].revenue;
- 
-  document.getElementById('top10').innerHTML = top10.map((c,i)=>`
-    <div class="tb-item">
-      <div class="tb-rank" style="background:${i<3?'rgba(0,212,255,0.15)':'var(--bg3)'};color:${i<3?'var(--cyan)':'var(--muted)'}">${i+1}</div>
-      <div class="tb-name">${c.name}</div>
-      <div class="tb-bar"><div class="prog-wrap"><div class="prog-bar" style="width:${Math.round((c.revenue/maxRev)*100)}%;background:linear-gradient(90deg,var(--cyan),var(--blue))"></div></div></div>
-      <div class="tb-val" style="color:var(--cyan)">₨${fmt(c.revenue)}</div>
-    </div>`).join('');
- 
-  const maxBot = Math.max(...bot10.map(c=>c.revenue));
-  document.getElementById('bottom10').innerHTML = bot10.map((c,i)=>`
-    <div class="tb-item">
-      <div class="tb-rank" style="background:rgba(255,77,106,0.12);color:var(--red)">${i+1}</div>
-      <div class="tb-name">${c.name}</div>
-      <div class="tb-bar"><div class="prog-wrap"><div class="prog-bar" style="width:${Math.round((c.revenue/maxBot)*100)}%;background:var(--red)"></div></div></div>
-      <div class="tb-val" style="color:var(--amber)">₨${fmt(c.revenue)}</div>
-    </div>`).join('');
+
+// ══════════════════════════════════════════════════
+// TAB SWITCH
+// ══════════════════════════════════════════════════
+const tabMeta = {
+  overview:{title:'Executive Summary',sub:'Overview · FY2025'},
+  pl:{title:'Profit & Loss Statement',sub:'Income Statement · FY2025'},
+  stock:{title:'Stock in Trade',sub:'Inventory Breakdown'},
+  payables:{title:'Trade & Other Payables',sub:'Creditors Breakdown'},
+  tax:{title:'Tax & Advance Receivables',sub:'Tax Position'},
+  borrowings:{title:'Short-Term Borrowings',sub:'Lender Breakdown'},
+  fixedassets:{title:'Fixed Assets',sub:'PP&E Schedule'},
+  cash:{title:'Cash & Bank Accounts',sub:'Bank Positions'},
+  ratios:{title:'Financial Ratios',sub:'Liquidity · Profitability · Leverage'},
+  yoy:{title:'Year-on-Year Comparison',sub:'FY2023 · FY2024 · FY2025'},
+  'rev-ranked':{title:'Revenue Ranked',sub:'Client Analytics · 65 Clients'},
+  outstanding:{title:'Outstanding AR & DSO',sub:'Client Analytics · Per Client'},
+  collection:{title:'Collection Efficiency',sub:'Client Analytics · Collection %'},
+  overdue:{title:'Overdue Alerts',sub:'Client Analytics · Action Required'},
+  margin:{title:'Margin per Client',sub:'Client Analytics · Est. Gross Margin'},
+  top10:{title:'Top 10 / Bottom 10',sub:'Client Analytics · Revenue Ranking'}
+};
+
+function switchTab(id, el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn,.nav-item').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('tab-'+id);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll(`[data-tab="${id}"]`).forEach(b=>b.classList.add('active'));
+  if(el) el.classList.add('active');
+  const m = tabMeta[id]||{};
+  document.getElementById('tb-title').textContent = m.title||id;
+  document.getElementById('tb-sub').textContent = m.sub||'';
 }
- 
-function renderMargin() {
-  const sorted = [...clients].sort((a,b)=>b.margin-a.margin);
-  document.getElementById('marginCard').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">` +
-  sorted.map(c=>`
-    <div style="background:var(--bg3);border-radius:8px;padding:12px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:500">${c.name}</div>
-        <div style="font-size:14px;font-weight:700;color:${c.margin>35?'var(--green)':c.margin>20?'var(--amber)':'var(--red)'}">${c.margin}%</div>
-      </div>
-      <div class="prog-wrap"><div class="prog-bar" style="width:${c.margin}%;background:${c.margin>35?'var(--green)':c.margin>20?'var(--amber)':'var(--red)'}"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted)">
-        <span>Revenue: ₨${fmt(c.revenue)}</span>
-        <span>Profit: ₨${fmt(c.profit)}</span>
-      </div>
-    </div>`).join('') + '</div>';
+
+// ══════════════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════════════
+function tick(){
+  const n=new Date();
+  document.getElementById('upd-time').textContent=n.toLocaleTimeString();
+  document.getElementById('tb-date').textContent=n.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
 }
- 
-function renderOutstanding() {
-  const sorted = [...clients].filter(c=>c.outstanding>0).sort((a,b)=>b.daysOverdue-a.daysOverdue);
-  const t = document.getElementById('outstandingTable');
-  t.innerHTML = `<thead><tr>
-    <th>Client</th><th>Outstanding</th><th>Invoice</th><th>Due Date</th><th>Days Overdue</th><th>Coll. Eff.</th><th>Risk</th>
-  </tr></thead><tbody>` +
-  sorted.map(c=>{
-    const risk = c.daysOverdue > 90 ? ['🔴 Critical','var(--red)'] : c.daysOverdue > 30 ? ['🟡 High','var(--amber)'] : c.daysOverdue > 0 ? ['🟠 Medium','#ff9500'] : ['🟢 Low','var(--green)'];
-    return `<tr>
-      <td style="font-weight:500">${c.name}</td>
-      <td class="mono" style="color:var(--amber)">₨${fmt(c.outstanding)}</td>
-      <td class="mono" style="color:var(--muted);font-size:11px">${c.invoice}</td>
-      <td class="mono" style="font-size:11px">${c.due}</td>
-      <td class="mono" style="font-weight:700;color:${c.daysOverdue>0?'var(--red)':'var(--green)'}">${c.daysOverdue > 0 ? '+'+c.daysOverdue+' days' : 'Not due'}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="prog-wrap" style="width:60px"><div class="prog-bar" style="width:${c.collEff}%;background:${c.collEff>=80?'var(--green)':c.collEff>=40?'var(--amber)':'var(--red)'}"></div></div>
-          <span class="mono" style="font-size:11px">${c.collEff}%</span>
-        </div>
-      </td>
-      <td style="color:${risk[1]};font-size:12px;font-weight:600">${risk[0]}</td>
-    </tr>`;
-  }).join('') + '</tbody>';
+tick(); setInterval(tick,30000);
+
+function refreshData(){
+  const b=document.querySelector('.tb-btn');
+  b.textContent='↻ Refreshing…';b.disabled=true;
+  setTimeout(()=>{b.textContent='↻ Refresh';b.disabled=false;tick();},1200);
 }
- 
-function renderCollKPI() {
-  const el = document.getElementById('collKpi');
-  el.innerHTML = [
-    {label:'Total Outstanding',val:'₨'+fmt(totalOutstanding),sub:'Receivable balance',cls:'c-amber'},
-    {label:'Overdue Outstanding',val:'₨'+fmt(overdueAmount),sub:overdueClients.length+' clients past due',cls:'c-red'},
-    {label:'Collection Efficiency',val:collEff+'%',sub:'Overall recovery rate',cls:'c-green'},
-    {label:'At-Risk Amount',val:'₨'+fmt(clients.filter(c=>c.daysOverdue>90).reduce((s,c)=>s+c.outstanding,0)),sub:'90+ days overdue',cls:'c-red'},
-  ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
-}
- 
-function renderCashFlow() {
-  const el = document.getElementById('cfForecast');
-  const maxVal = Math.max(cf30, cf60, cf90, 1);
-  el.innerHTML = ['30','60','90'].map((d,i) => {
-    const val = [cf30,cf60,cf90][i];
-    const pct = Math.round((val/maxVal)*100);
-    const color = ['var(--cyan)','var(--green)','var(--purple)'][i];
-    return `<div class="cf-row">
-      <div class="cf-label">${d}d</div>
-      <div class="cf-bar-wrap">
-        <div class="cf-bar" style="width:${pct}%;background:linear-gradient(90deg,${color}22,${color}44);">
-          <span style="color:${color};font-size:11px;font-weight:700">${d}-Day Window</span>
-        </div>
-      </div>
-      <div class="cf-val" style="color:${color}">₨${fmt(val)}</div>
-    </div>`;
-  }).join('');
- 
-  const cfGrid = document.getElementById('cfGrid');
-  const cards = [
-    {period:'30 Days',val:cf30,color:'var(--cyan)',desc:'Receivables due in next 30 days',icon:'📅'},
-    {period:'60 Days',val:cf60,color:'var(--green)',desc:'Cumulative receivables by 60 days',icon:'📆'},
-    {period:'90 Days',val:cf90,color:'var(--purple)',desc:'Total projected cash by 90 days',icon:'🗓️'},
-  ];
-  cfGrid.innerHTML = cards.map(c=>`
-    <div class="card">
-      <div class="card-body" style="text-align:center;padding:28px">
-        <div style="font-size:28px;margin-bottom:8px">${c.icon}</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${c.period} Cash In</div>
-        <div style="font-size:28px;font-weight:800;color:${c.color};letter-spacing:-1px">₨${fmt(c.val)}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">${c.desc}</div>
-      </div>
-    </div>`).join('');
-}
- 
-function renderAlerts() {
-  const sorted = [...overdueClients].sort((a,b)=>b.daysOverdue-a.daysOverdue);
-  document.getElementById('alertCount').textContent = sorted.length + ' ALERTS';
-  document.getElementById('alertsList').innerHTML = sorted.length === 0
-    ? '<div style="color:var(--green);text-align:center;padding:20px">✅ No overdue clients</div>'
-    : sorted.map(c=>{
-        const sev = c.daysOverdue > 90 ? 'critical' : 'warn';
-        return `<div class="alert-item">
-          <div class="alert-icon ${sev}">${c.daysOverdue>90?'🚨':'⚠️'}</div>
-          <div style="flex:1">
-            <div class="alert-name">${c.name}</div>
-            <div class="alert-detail">Outstanding: ₨${fmt(c.outstanding)} · Due: ${c.due} · Efficiency: ${c.collEff}%</div>
-          </div>
-          <div class="alert-days ${sev}">+${c.daysOverdue}d</div>
-        </div>`;
-      }).join('');
-}
- 
-function renderFXSensitivity() {
-  const rates = [270, 280, 283.76, 290, 300, 310, 320];
-  document.getElementById('fxSensitivity').innerHTML = `
-    <table class="tbl">
-      <thead><tr><th>USD/PKR Rate</th><th>PKR Cost</th><th>vs Base</th></tr></thead>
-      <tbody>` +
-    rates.map(r=>{
-      const cost = Math.round(USD_EXPOSURE_USD * r);
-      const diff = cost - USD_EXPOSURE_PKR;
-      const isBase = Math.abs(r - USD_RATE_BASE) < 0.01;
-      return `<tr style="${isBase?'background:rgba(0,212,255,0.05)':''}">
-        <td class="mono" style="color:${isBase?'var(--cyan)':'inherit'}">${r.toFixed(2)}${isBase?' ★':''}</td>
-        <td class="mono">₨${fmt(cost)}</td>
-        <td class="mono" style="color:${diff>0?'var(--red)':diff<0?'var(--green)':'var(--muted)'}">${diff===0?'Base':(diff>0?'+':'')+fmt(Math.abs(diff))}</td>
-      </tr>`;
-    }).join('') + '</tbody></table>';
-}
- 
-function calcFX() {
-  const usd = parseFloat(document.getElementById('fxUSD').value)||0;
-  const rate = parseFloat(document.getElementById('fxRate').value)||283.76;
-  const baseCost = Math.round(usd * USD_RATE_BASE);
-  const newCost = Math.round(usd * rate);
-  const diff = newCost - baseCost;
-  const color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--muted)';
-  document.getElementById('fxResult').innerHTML = `
-    <div class="fx-meter">
-      <div class="fx-row"><span class="fx-row-label">USD Amount</span><span class="fx-row-val">$ ${usd.toLocaleString()}</span></div>
-      <div class="fx-row"><span class="fx-row-label">Base Rate (283.76)</span><span class="fx-row-val">₨ ${baseCost.toLocaleString()}</span></div>
-      <div class="fx-row"><span class="fx-row-label">New Rate (${rate})</span><span class="fx-row-val" style="color:var(--cyan)">₨ ${newCost.toLocaleString()}</span></div>
-      <div class="fx-row"><span class="fx-row-label">Impact</span><span class="fx-row-val" style="color:${color}">${diff>0?'▲ +':'▼ '}₨ ${Math.abs(diff).toLocaleString()}</span></div>
-    </div>`;
-}
- 
-// ── SIDEBAR NAV ───────────────────────────────────────────────────────────────
-function switchTab(id, el) {
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  el.classList.add('active');
-}
- 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-function init() {
-  const now = new Date();
-  const ds = now.toLocaleDateString('en-PK',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  document.getElementById('navDate').textContent = ds;
-  document.getElementById('bottomDate').textContent = 'Last updated: '+ds;
- 
-  renderKPIs();
-  renderRevenueRanked();
-  renderWCScore();
-  renderCollEff();
-  renderTop10Bottom10();
-  renderMargin();
-  renderOutstanding();
-  renderCollKPI();
-  renderCashFlow();
-  renderAlerts();
-  renderFXSensitivity();
-  calcFX();
-  // update sidebar badge
-  document.getElementById('sidebarAlertCount').textContent = overdueClients.length;
-}
- 
-init();
 </script>
 </body>
 </html>
